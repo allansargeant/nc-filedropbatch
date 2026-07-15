@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace OCA\FileDropBatch\Controller;
 
 use OCA\FileDropBatch\AppInfo\Application;
+use OCA\FileDropBatch\Db\BatchMapper;
 use OCA\FileDropBatch\Service\BatchProcessorService;
+use OCA\FileDropBatch\Service\PathSanitizer;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -15,6 +17,7 @@ use OCP\IGroupManager;
 use OCP\IRequest;
 use OCP\IUser;
 use OCP\IUserSession;
+use Psr\Log\LoggerInterface;
 
 class BatchController extends Controller {
     public function __construct(
@@ -24,6 +27,8 @@ class BatchController extends Controller {
         private IGroupManager $groupManager,
         private IConfig $config,
         private BatchProcessorService $processor,
+        private BatchMapper $batchMapper,
+        private LoggerInterface $logger,
     ) {
         parent::__construct($appName, $request);
     }
@@ -75,6 +80,18 @@ class BatchController extends Controller {
         }
 
         $this->config->setUserValue($user->getUID(), Application::APP_ID, 'base_folder', $baseFolder);
+
+        if ($result['summary']['success'] + $result['summary']['partial'] > 0) {
+            try {
+                $this->batchMapper->insertBatch($user->getUID(), PathSanitizer::sanitizeSegment($baseFolder), $expiry);
+            } catch (\Throwable $e) {
+                // Don't fail the whole request over bookkeeping for the site-sync feature.
+                $this->logger->error('File drop batch: could not record batch for scheduled sync', [
+                    'app' => Application::APP_ID,
+                    'exception' => $e,
+                ]);
+            }
+        }
 
         $response = [
             'summary' => $result['summary'],

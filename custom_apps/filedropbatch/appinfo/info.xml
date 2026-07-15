@@ -9,8 +9,11 @@ create a nested folder per row, an upload-only "file drop" public share link for
 (with a single expiry date/time applied to the whole batch), email each presenter their link,
 and download a copy of the CSV with the file drop link added. Optionally also creates shared
 root folders (Holding slides, fonts, schedules, all show, plus custom names) and a Nextcloud
-account per distinct theatre, scoped to its own theatre folder and the shared root folders.]]></description>
-    <version>1.1.0</version>
+account per distinct theatre, scoped to its own theatre folder and the shared root folders.
+Can also automatically mirror the whole base folder to a separate Nextcloud instance via
+rclone over WebDAV once a batch's file-drop links have expired, for replicating collected
+files to a server taken to the event site.]]></description>
+    <version>1.2.0</version>
     <licence>agpl</licence>
     <author>Allan Sargeant</author>
     <namespace>FileDropBatch</namespace>
@@ -29,4 +32,8 @@ account per distinct theatre, scoped to its own theatre folder and the shared ro
             <order>50</order>
         </navigation>
     </navigations>
+    <settings>
+        <admin>OCA\FileDropBatch\Settings\AdminSettings</admin>
+        <admin-section>OCA\FileDropBatch\Settings\AdminSection</admin-section>
+    </settings>
 </info>
