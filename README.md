@@ -1,5 +1,10 @@
 # File Drop Batch
 
+> **AI-assisted project.** This codebase was created with [Claude Code](https://claude.com/claude-code)
+> (Anthropic), directed and reviewed by a human author — including the code, the docs,
+> and the visuals in this README. Review it yourself before relying on it in production,
+> same as you would for any code.
+
 A Nextcloud app for theatre/event production teams. Upload a CSV of sessions and it will:
 
 ![Architecture: CSV in, folders/shares/accounts out](docs/architecture.svg)
@@ -67,10 +72,10 @@ The manual `chown`/`maintenance:install` steps are needed because the `custom_ap
 
 Two sample CSVs are included: `sample-sessions.csv` (a clean golden-path file) and `sample-sessions-edge-cases.csv` (duplicate rows, invalid email, bad date/time, missing fields, to exercise the success/partial/error paths).
 
+## Roadmap / TODO
+
+- [ ] Replace the static README mockup with a live screenshot captured from a running instance (the local `docker-compose` dev stack above stands one up).
+
 ## License
 
 AGPL-3.0, matching Nextcloud's own app licensing convention.
-
-## AI disclosure
-
-This app's code, docs, and the visuals in this README were built with [Claude Code](https://claude.com/claude-code), Anthropic's AI coding assistant, working with a human collaborator who directed the design, reviewed the changes, and ran the verification steps described above. Review it yourself before relying on it in production, same as you would for any code.
