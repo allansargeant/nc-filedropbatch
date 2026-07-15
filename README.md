@@ -2,6 +2,8 @@
 
 A Nextcloud app for theatre/event production teams. Upload a CSV of sessions and it will:
 
+![Architecture: CSV in, folders/shares/accounts out](docs/architecture.svg)
+
 - create a nested folder per row (`Theatre / Date / "Start Time - Presenter"`),
 - create an upload-only "file drop" public link for each folder, with a single expiry date applied to the whole batch,
 - email each presenter their link,
@@ -11,6 +13,12 @@ Optionally, it can also:
 
 - create a set of shared root folders (`Holding slides`, `fonts`, `schedules`, `all show`, plus custom names) once at the top of the batch, and
 - create a Nextcloud account per distinct theatre in the CSV, scoped to its own theatre folder plus the shared root folders (not other theatres), with a generated password saved to a downloadable CSV. Creating accounts is restricted to admins/subadmins.
+
+## The upload page
+
+![The upload form and results tables, with sample data](docs/screenshots/app-preview.png)
+
+*A static mockup built from the app's real CSS/markup with illustrative sample data (not a live capture) - see [`docs/mockups/app-preview.html`](docs/mockups/app-preview.html).*
 
 ## Input CSV format
 

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>File Drop Batch - preview</title>
+<link rel="stylesheet" href="../../custom_apps/filedropbatch/css/style.css">
+<style>
+  html, body {
+    margin: 0;
+    background: #14181c;
+    color: #ebebeb;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .nc-topbar {
+    background: #14181c;
+    border-bottom: 1px solid #2a2f35;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: bold;
+  }
+  .nc-topbar .dot {
+    width: 10px; height: 10px; border-radius: 50%; background: #0082c9;
+  }
+  .nc-topbar .path {
+    opacity: 0.6;
+    font-weight: normal;
+  }
+  a { color: #6cb6ea; }
+  .fdb-error { display: none; }
+</style>
+</head>
+<body>
+  <div class="nc-topbar">
+    <span class="dot"></span>
+    <span>Nextcloud</span>
+    <span class="path">&rsaquo; File Drop Batch</span>
+  </div>
+
+<div id="filedropbatch" class="filedropbatch">
+    <h2>File Drop Batch</h2>
+    <p class="fdb-intro">
+        Upload a CSV with columns <code>Date, Theatre, Start Time, presenter name, presenter email</code>.
+        A folder and an upload-only file drop link will be created for each row, and the link will be
+        emailed to the presenter. Optionally, shared root folders and a Nextcloud account per theatre
+        can also be created below.
+    </p>
+
+    <form id="filedropbatch-form" enctype="multipart/form-data">
+        <div class="fdb-field">
+            <label for="fdb-csv-file">CSV file</label>
+            <input type="file" id="fdb-csv-file" name="csv_file" value="autumn-showcase-2026.csv">
+        </div>
+
+        <div class="fdb-field">
+            <label for="fdb-expiry">Link expiry date</label>
+            <input type="date" id="fdb-expiry" name="expiry_date" value="2026-09-15">
+            <p class="fdb-hint">
+                Links expire at the start of this date. Nextcloud only supports whole-day expiry
+                for share links, so the earliest option is tomorrow.
+            </p>
+        </div>
+
+        <div class="fdb-field">
+            <label for="fdb-base-folder">Base folder</label>
+            <input type="text" id="fdb-base-folder" name="base_folder" value="File Drops">
+        </div>
+
+        <fieldset class="fdb-field">
+            <legend>Root folders for this batch</legend>
+            <p class="fdb-hint">
+                Created once at the top of the base folder and shared with every theatre account below.
+            </p>
+            <label class="fdb-checkbox"><input type="checkbox" checked> Holding slides</label>
+            <label class="fdb-checkbox"><input type="checkbox" checked> fonts</label>
+            <label class="fdb-checkbox"><input type="checkbox" checked> schedules</label>
+            <label class="fdb-checkbox"><input type="checkbox" checked> all show</label>
+            <label for="fdb-custom-folders">Custom folders (comma-separated)</label>
+            <input type="text" id="fdb-custom-folders" name="custom_folders" value="Costumes, Props">
+        </fieldset>
+
+        <fieldset class="fdb-field">
+            <legend>Theatre accounts</legend>
+            <label class="fdb-checkbox">
+                <input type="checkbox" checked>
+                Create a Nextcloud account for each distinct theatre in the CSV
+            </label>
+            <p class="fdb-hint">
+                Each account gets a generated password and access to its own theatre folder plus
+                the root folders above (not other theatres). Passwords are shown once and saved
+                to a downloadable CSV - store it securely.
+            </p>
+        </fieldset>
+
+        <button type="submit" class="primary" id="fdb-submit">Process CSV</button>
+    </form>
+
+    <div id="fdb-results" class="fdb-results">
+        <h3>Results</h3>
+        <p id="fdb-summary">Total: 5 - Success: 3 - Partial: 1 - Error: 1</p>
+        <a id="fdb-download" class="button" href="#">Download results CSV</a>
+        <table id="fdb-table">
+            <thead>
+                <tr>
+                    <th>Row</th>
+                    <th>Theatre</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Presenter</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Link</th>
+                    <th>Message</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>2</td><td>Globe</td><td>2026-09-12</td><td>17:00</td>
+                    <td>A. Smith</td><td>a.smith@example.com</td>
+                    <td class="fdb-status-success">success</td>
+                    <td><a href="#">https://cloud.example.org/s/Ax3nQpZ9Ke</a></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>3</td><td>Globe</td><td>2026-09-12</td><td>19:30</td>
+                    <td>B. Chen</td><td>b.chen@example.com</td>
+                    <td class="fdb-status-success">success</td>
+                    <td><a href="#">https://cloud.example.org/s/Wr7mFcVb2s</a></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>4</td><td>Rose</td><td>2026-09-13</td><td>09:00</td>
+                    <td>C. White</td><td>c.white@example.com</td>
+                    <td class="fdb-status-success">success</td>
+                    <td><a href="#">https://cloud.example.org/s/Tn4kLdRp8h</a></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>5</td><td>Rose</td><td>2026-09-13</td><td>10:00</td>
+                    <td>D. Okafor</td><td>not-an-email</td>
+                    <td class="fdb-status-partial">partial</td>
+                    <td><a href="#">https://cloud.example.org/s/Jy6qEo3Msx</a></td>
+                    <td>Invalid email address - link not emailed, deliver manually.</td>
+                </tr>
+                <tr>
+                    <td>6</td><td>Swan</td><td>2026-09-14</td><td>teatime</td>
+                    <td>E. Larsson</td><td>e.larsson@example.com</td>
+                    <td class="fdb-status-error">error</td>
+                    <td></td>
+                    <td>Unrecognized time format: "teatime"</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="fdb-users-results" class="fdb-results">
+        <h3>Theatre accounts</h3>
+        <p id="fdb-users-summary">Total: 3 - Created: 3 - Existing: 0 - Error: 0</p>
+        <p class="fdb-hint">Passwords are shown once and cannot be retrieved again - save the CSV securely.</p>
+        <a id="fdb-users-download" class="button" href="#">Download theatre accounts CSV</a>
+        <table id="fdb-users-table">
+            <thead>
+                <tr>
+                    <th>Theatre</th>
+                    <th>Username</th>
+                    <th>Password</th>
+                    <th>Status</th>
+                    <th>Message</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Globe</td><td>globe</td><td>Xk4$pQr8Nzw#2Ldm</td>
+                    <td class="fdb-status-created">created</td><td></td>
+                </tr>
+                <tr>
+                    <td>Rose</td><td>rose</td><td>Bv7@wFhT3sE!9jRc</td>
+                    <td class="fdb-status-created">created</td><td></td>
+                </tr>
+                <tr>
+                    <td>Swan</td><td>swan</td><td>Gt2%nMdY6uWq!8fX</td>
+                    <td class="fdb-status-created">created</td><td></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

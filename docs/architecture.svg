@@ -1,0 +1,151 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" font-family="-apple-system, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/>
+    </marker>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#0082c9"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1200" height="900" fill="#14181c"/>
+
+  <!-- Title -->
+  <text x="600" y="40" text-anchor="middle" fill="#ffffff" font-size="24" font-weight="bold">One CSV in, a fully-scoped Nextcloud workspace out</text>
+  <text x="600" y="65" text-anchor="middle" fill="#9aa2ac" font-size="14">Date, Theatre, Start Time, presenter name, presenter email</text>
+
+  <!-- CSV -> App -->
+  <g>
+    <rect x="40" y="100" width="150" height="60" rx="8" fill="#1c2128" stroke="#3a4048"/>
+    <text x="115" y="126" text-anchor="middle" fill="#ffffff" font-size="14" font-weight="bold">sessions.csv</text>
+    <text x="115" y="144" text-anchor="middle" fill="#9aa2ac" font-size="11">6 rows, 3 theatres</text>
+
+    <line x1="190" y1="130" x2="248" y2="130" stroke="#6b7280" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <rect x="250" y="95" width="190" height="70" rx="8" fill="#0082c9" opacity="0.15" stroke="#0082c9" stroke-width="1.5"/>
+    <text x="345" y="124" text-anchor="middle" fill="#ffffff" font-size="14" font-weight="bold">File Drop Batch</text>
+    <text x="345" y="142" text-anchor="middle" fill="#9aa2ac" font-size="11">folders + shares + accounts</text>
+  </g>
+
+  <!-- Folder tree -->
+  <g font-size="13">
+    <text x="40" y="205" fill="#ffffff" font-size="14" font-weight="bold">File Drops/  (base folder)</text>
+
+    <!-- shared root folders -->
+    <g>
+      <rect x="60" y="220" width="150" height="30" rx="6" fill="#2a2f37" stroke="#4a5058"/>
+      <text x="135" y="240" text-anchor="middle" fill="#e6e6e6">Holding slides</text>
+
+      <rect x="220" y="220" width="110" height="30" rx="6" fill="#2a2f37" stroke="#4a5058"/>
+      <text x="275" y="240" text-anchor="middle" fill="#e6e6e6">fonts</text>
+
+      <rect x="340" y="220" width="120" height="30" rx="6" fill="#2a2f37" stroke="#4a5058"/>
+      <text x="400" y="240" text-anchor="middle" fill="#e6e6e6">schedules</text>
+
+      <rect x="470" y="220" width="120" height="30" rx="6" fill="#2a2f37" stroke="#4a5058"/>
+      <text x="530" y="240" text-anchor="middle" fill="#e6e6e6">all show</text>
+
+      <text x="605" y="240" fill="#6b7280" font-size="12">(+ custom folders)</text>
+    </g>
+    <text x="60" y="270" fill="#9aa2ac" font-size="11">shared with every theatre account below</text>
+
+    <!-- Theatre columns -->
+    <!-- Globe -->
+    <g>
+      <rect x="60" y="310" width="330" height="30" rx="6" fill="#1d3a2e" stroke="#2f8a5e" stroke-width="1.5"/>
+      <text x="225" y="330" text-anchor="middle" fill="#ffffff" font-weight="bold">Globe/</text>
+
+      <rect x="90" y="355" width="280" height="26" rx="5" fill="#20262d" stroke="#3a4048"/>
+      <text x="230" y="373" text-anchor="middle" fill="#c9cfd6" font-size="12">2026-09-12/</text>
+
+      <rect x="110" y="390" width="260" height="26" rx="5" fill="#181d23" stroke="#2f3540"/>
+      <text x="240" y="408" text-anchor="middle" fill="#c9cfd6" font-size="11">17:00 - A. Smith &#8594; a.smith@example.com</text>
+
+      <rect x="110" y="422" width="260" height="26" rx="5" fill="#181d23" stroke="#2f3540"/>
+      <text x="240" y="440" text-anchor="middle" fill="#c9cfd6" font-size="11">19:30 - B. Chen &#8594; b.chen@example.com</text>
+    </g>
+
+    <!-- Rose -->
+    <g>
+      <rect x="420" y="310" width="330" height="30" rx="6" fill="#1d3040" stroke="#2f6a8a" stroke-width="1.5"/>
+      <text x="585" y="330" text-anchor="middle" fill="#ffffff" font-weight="bold">Rose/</text>
+
+      <rect x="450" y="355" width="280" height="26" rx="5" fill="#20262d" stroke="#3a4048"/>
+      <text x="590" y="373" text-anchor="middle" fill="#c9cfd6" font-size="12">2026-09-13/</text>
+
+      <rect x="470" y="390" width="260" height="26" rx="5" fill="#181d23" stroke="#2f3540"/>
+      <text x="600" y="408" text-anchor="middle" fill="#c9cfd6" font-size="11">09:00 - C. White &#8594; c.white@example.com</text>
+    </g>
+
+    <!-- Swan -->
+    <g>
+      <rect x="780" y="310" width="330" height="30" rx="6" fill="#3a2a1d" stroke="#8a6a2f" stroke-width="1.5"/>
+      <text x="945" y="330" text-anchor="middle" fill="#ffffff" font-weight="bold">Swan/</text>
+
+      <rect x="810" y="355" width="280" height="26" rx="5" fill="#20262d" stroke="#3a4048"/>
+      <text x="950" y="373" text-anchor="middle" fill="#c9cfd6" font-size="12">2026-09-14/</text>
+
+      <rect x="830" y="390" width="260" height="26" rx="5" fill="#181d23" stroke="#2f3540"/>
+      <text x="960" y="408" text-anchor="middle" fill="#c9cfd6" font-size="11">15:00 - D. Kim &#8594; d.kim@example.com</text>
+    </g>
+  </g>
+
+  <!-- connector lines from shared folders down to each theatre account -->
+  <line x1="135" y1="250" x2="135" y2="470" stroke="#0082c9" stroke-width="1" stroke-dasharray="3,4" opacity="0.5"/>
+  <line x1="400" y1="250" x2="500" y2="470" stroke="#0082c9" stroke-width="1" stroke-dasharray="3,4" opacity="0.5"/>
+  <line x1="530" y1="250" x2="860" y2="470" stroke="#0082c9" stroke-width="1" stroke-dasharray="3,4" opacity="0.5"/>
+
+  <!-- Theatre accounts row -->
+  <text x="40" y="500" fill="#ffffff" font-size="16" font-weight="bold">One Nextcloud account per theatre, each scoped to only its own folder + the shared ones</text>
+
+  <g>
+    <!-- globe account -->
+    <rect x="60" y="530" width="330" height="90" rx="8" fill="#1d3a2e" stroke="#2f8a5e" stroke-width="1.5"/>
+    <text x="225" y="558" text-anchor="middle" fill="#ffffff" font-weight="bold" font-size="14">globe</text>
+    <text x="225" y="578" text-anchor="middle" fill="#a9e2c4" font-size="11">read/write/create/delete on:</text>
+    <text x="225" y="596" text-anchor="middle" fill="#a9e2c4" font-size="11">Globe/ + Holding slides, fonts, schedules, all show</text>
+    <text x="225" y="612" text-anchor="middle" fill="#e07a7a" font-size="11">no access to Rose/ or Swan/</text>
+
+    <!-- rose account -->
+    <rect x="420" y="530" width="330" height="90" rx="8" fill="#1d3040" stroke="#2f6a8a" stroke-width="1.5"/>
+    <text x="585" y="558" text-anchor="middle" fill="#ffffff" font-weight="bold" font-size="14">rose</text>
+    <text x="585" y="578" text-anchor="middle" fill="#a9d4f0" font-size="11">read/write/create/delete on:</text>
+    <text x="585" y="596" text-anchor="middle" fill="#a9d4f0" font-size="11">Rose/ + Holding slides, fonts, schedules, all show</text>
+    <text x="585" y="612" text-anchor="middle" fill="#e07a7a" font-size="11">no access to Globe/ or Swan/</text>
+
+    <!-- swan account -->
+    <rect x="780" y="530" width="330" height="90" rx="8" fill="#3a2a1d" stroke="#8a6a2f" stroke-width="1.5"/>
+    <text x="945" y="558" text-anchor="middle" fill="#ffffff" font-weight="bold" font-size="14">swan</text>
+    <text x="945" y="578" text-anchor="middle" fill="#e8c98a" font-size="11">read/write/create/delete on:</text>
+    <text x="945" y="596" text-anchor="middle" fill="#e8c98a" font-size="11">Swan/ + Holding slides, fonts, schedules, all show</text>
+    <text x="945" y="612" text-anchor="middle" fill="#e07a7a" font-size="11">no access to Globe/ or Rose/</text>
+  </g>
+
+  <!-- Presenter email flow -->
+  <g>
+    <text x="600" y="675" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="bold">Each session also gets its own upload-only "File request" link, emailed to the presenter</text>
+
+    <rect x="120" y="700" width="220" height="50" rx="8" fill="#1c2128" stroke="#3a4048"/>
+    <text x="230" y="722" text-anchor="middle" fill="#e6e6e6" font-size="12">17:00 - A. Smith folder</text>
+    <text x="230" y="740" text-anchor="middle" fill="#9aa2ac" font-size="11">upload-only public link</text>
+
+    <line x1="340" y1="725" x2="410" y2="725" stroke="#0082c9" stroke-width="2" marker-end="url(#arrowBlue)"/>
+
+    <rect x="415" y="700" width="230" height="50" rx="8" fill="#0082c9" opacity="0.15" stroke="#0082c9" stroke-width="1.5"/>
+    <text x="530" y="722" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="bold">email to presenter</text>
+    <text x="530" y="740" text-anchor="middle" fill="#9aa2ac" font-size="11">a.smith@example.com</text>
+
+    <line x1="645" y1="725" x2="715" y2="725" stroke="#6b7280" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <rect x="720" y="700" width="240" height="50" rx="8" fill="#1c2128" stroke="#3a4048"/>
+    <text x="840" y="722" text-anchor="middle" fill="#e6e6e6" font-size="12">presenter uploads their files</text>
+    <text x="840" y="740" text-anchor="middle" fill="#9aa2ac" font-size="11">can't see/download other files</text>
+  </g>
+
+  <!-- Output CSV note -->
+  <g>
+    <rect x="60" y="800" width="1080" height="70" rx="8" fill="#1c2128" stroke="#3a4048"/>
+    <text x="600" y="828" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="bold">Two output CSVs, downloadable straight from the results page</text>
+    <text x="600" y="850" text-anchor="middle" fill="#9aa2ac" font-size="12">results CSV: original columns + File Drop Link + Status/Notes &#160;&#160;&#8226;&#160;&#160; theatre accounts CSV: Theatre, Username, Password, Status/Notes</text>
+  </g>
+</svg>
