@@ -70,3 +70,7 @@ Two sample CSVs are included: `sample-sessions.csv` (a clean golden-path file) a
 ## License
 
 AGPL-3.0, matching Nextcloud's own app licensing convention.
+
+## AI disclosure
+
+This app's code, docs, and the visuals in this README were built with [Claude Code](https://claude.com/claude-code), Anthropic's AI coding assistant, working with a human collaborator who directed the design, reviewed the changes, and ran the verification steps described above. Review it yourself before relying on it in production, same as you would for any code.
