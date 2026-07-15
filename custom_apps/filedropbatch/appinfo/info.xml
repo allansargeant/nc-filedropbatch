@@ -12,8 +12,9 @@ root folders (Holding slides, fonts, schedules, all show, plus custom names) and
 account per distinct theatre, scoped to its own theatre folder and the shared root folders.
 Can also automatically mirror the whole base folder to a separate Nextcloud instance via
 rclone over WebDAV once a batch's file-drop links have expired, for replicating collected
-files to a server taken to the event site.]]></description>
-    <version>1.2.0</version>
+files to a server taken to the event site. Every session (from a CSV or added manually)
+is tracked in a Sessions list where it can be edited, closed early, or removed.]]></description>
+    <version>1.3.0</version>
     <licence>agpl</licence>
     <author>Allan Sargeant</author>
     <namespace>FileDropBatch</namespace>

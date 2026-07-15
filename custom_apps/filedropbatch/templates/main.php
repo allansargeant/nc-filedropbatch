@@ -110,4 +110,67 @@
             <tbody></tbody>
         </table>
     </div>
+
+    <div id="fdb-sessions-section" class="fdb-results">
+        <h3>Sessions</h3>
+        <p class="fdb-hint">
+            Every session created via CSV or added manually. Editing moves the folder to match the new
+            details (the link keeps working); Close revokes the upload link immediately; Delete only
+            stops tracking a session here - the folder, its files, and its link (if still open) are left alone.
+        </p>
+
+        <button type="button" class="primary" id="fdb-add-session-toggle">Add session</button>
+
+        <form id="fdb-add-session-form" class="fdb-add-session-form" hidden>
+            <div class="fdb-field">
+                <label for="fdb-new-theatre">Theatre</label>
+                <input type="text" id="fdb-new-theatre" name="theatre" required>
+            </div>
+            <div class="fdb-field">
+                <label for="fdb-new-date">Date</label>
+                <input type="text" id="fdb-new-date" name="date" placeholder="2026-08-01" required>
+            </div>
+            <div class="fdb-field">
+                <label for="fdb-new-start-time">Start time</label>
+                <input type="text" id="fdb-new-start-time" name="start_time" placeholder="17:00" required>
+            </div>
+            <div class="fdb-field">
+                <label for="fdb-new-presenter-name">Presenter name</label>
+                <input type="text" id="fdb-new-presenter-name" name="presenter_name" required>
+            </div>
+            <div class="fdb-field">
+                <label for="fdb-new-presenter-email">Presenter email</label>
+                <input type="email" id="fdb-new-presenter-email" name="presenter_email" required>
+            </div>
+            <div class="fdb-field">
+                <label for="fdb-new-base-folder">Base folder</label>
+                <input type="text" id="fdb-new-base-folder" name="base_folder" value="<?php p($_['baseFolder']); ?>">
+            </div>
+            <div class="fdb-field">
+                <label for="fdb-new-expiry">Link expiry date</label>
+                <input type="date" id="fdb-new-expiry" name="expiry_date"
+                       min="<?php p(date('Y-m-d', strtotime('+1 day'))); ?>" required>
+            </div>
+            <button type="submit" class="primary">Create session</button>
+            <button type="button" id="fdb-add-session-cancel">Cancel</button>
+        </form>
+
+        <div id="fdb-sessions-error" class="fdb-error" hidden></div>
+
+        <table id="fdb-sessions-table">
+            <thead>
+                <tr>
+                    <th>Theatre</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Presenter</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Link</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
 </div>

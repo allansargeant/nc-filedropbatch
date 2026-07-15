@@ -95,3 +95,47 @@ fieldset.fdb-field legend {
     border-bottom: 1px solid var(--color-border, #ddd);
     font-size: 0.9em;
 }
+
+.fdb-status-open { color: var(--color-success, #2d7d46); font-weight: bold; }
+.fdb-status-closed { color: var(--color-text-maxcontrast, #767676); font-weight: bold; }
+
+.fdb-add-session-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: flex-end;
+    margin: 12px 0;
+    padding: 12px;
+    border: 1px solid var(--color-border, #ddd);
+    border-radius: 4px;
+}
+
+.fdb-add-session-form .fdb-field {
+    margin-bottom: 0;
+    max-width: 200px;
+}
+
+#fdb-sessions-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+}
+
+#fdb-sessions-table th,
+#fdb-sessions-table td {
+    text-align: left;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--color-border, #ddd);
+    font-size: 0.9em;
+}
+
+#fdb-sessions-table input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#fdb-sessions-table .fdb-actions {
+    display: flex;
+    gap: 6px;
+    white-space: nowrap;
+}

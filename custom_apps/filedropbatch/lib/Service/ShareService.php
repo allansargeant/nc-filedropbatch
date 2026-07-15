@@ -8,6 +8,7 @@ use OCP\Constants;
 use OCP\Files\Folder;
 use OCP\Files\Node;
 use OCP\IURLGenerator;
+use OCP\Share\Exceptions\ShareNotFound;
 use OCP\Share\IManager;
 use OCP\Share\IShare;
 
@@ -62,5 +63,34 @@ class ShareService {
         $share->setShareOwner($ownerUid);
 
         $this->shareManager->createShare($share);
+    }
+
+    /**
+     * Looks up a share by its full id (IShare::getFullId(), e.g. "ocinternal:42").
+     * Returns null rather than throwing if it's gone (already deleted/closed).
+     */
+    public function findByFullId(string $fullShareId): ?IShare {
+        try {
+            return $this->shareManager->getShareById($fullShareId);
+        } catch (ShareNotFound) {
+            return null;
+        }
+    }
+
+    /**
+     * Revokes (deletes) the given share outright. A no-op if it's already
+     * gone, so closing an already-closed session isn't an error.
+     */
+    public function revokeShare(string $fullShareId, string $ownerUid): void {
+        $share = $this->findByFullId($fullShareId);
+        if ($share === null) {
+            return;
+        }
+
+        if ($share->getShareOwner() !== $ownerUid) {
+            throw new \RuntimeException('Cannot revoke a share owned by another user');
+        }
+
+        $this->shareManager->deleteShare($share);
     }
 }

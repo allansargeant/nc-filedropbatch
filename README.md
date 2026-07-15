@@ -19,6 +19,7 @@ Optionally, it can also:
 - create a set of shared root folders (`Holding slides`, `fonts`, `schedules`, `all show`, plus custom names) once at the top of the batch, and
 - create a Nextcloud account per distinct theatre in the CSV, scoped to its own theatre folder plus the shared root folders (not other theatres), with a generated password saved to a downloadable CSV. Creating accounts is restricted to admins/subadmins.
 - once a batch's file-drop links pass their expiry, automatically mirror the whole base folder to a separate Nextcloud instance (e.g. a server taken to the event site) via `rclone` over WebDAV - see [Site-server sync](#site-server-sync) below.
+- track every session (from a CSV or added manually) in a persistent Sessions list, where you can edit its details, close its link early, or remove it - see [Managing sessions](#managing-sessions) below.
 
 ## The upload page
 
@@ -45,6 +46,16 @@ The app needs no Composer dependencies - it only uses Nextcloud's built-in OCP A
 ### Note on link expiry
 
 Nextcloud's public link share expiration is date-only: the server truncates both the expiration date and "now" to midnight before comparing, so the earliest valid expiry is always tomorrow, and the share effectively expires at 00:00 on the chosen date regardless of what time you might otherwise expect. This is a platform behavior, not something this app can override.
+
+## Managing sessions
+
+Every session - whether it came from a CSV row or was added one at a time - is tracked in a Sessions list on the main page, with three actions:
+
+- **Edit** changes the theatre, date, start time, or presenter name, and actually **moves the real folder** to match (e.g. renaming the time updates the `"17:00 - A. Smith"` folder itself). This works because Nextcloud shares reference a folder by its internal file id, not its path, so the existing file-drop link keeps resolving to the same folder after the move - the presenter isn't re-emailed, since only the folder location and displayed metadata changed, not the link itself.
+- **Close now** revokes that session's file-drop share outright, immediately and irreversibly - there's no grace period, and it can't be reopened (a fresh session would need to be created instead). This only affects that one session; other sessions in the same batch, and the batch's own site-server sync scheduling, are untouched - closing does **not** trigger an early sync.
+- **Delete** only removes the session from this list. The real folder, anything uploaded into it, and its share (if not separately closed) are left exactly as they are - if you actually want the folder gone, do that separately in Files.
+
+"Add session" on the same page creates a single session outside of a CSV, through the identical folder/share/email logic as a CSV row (including its own expiry date, since Nextcloud's link expiry is set per-share, not editable after the fact via this app).
 
 ## Site-server sync
 
