@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
+    <id>filedropbatch</id>
+    <name>File Drop Batch</name>
+    <summary>Bulk-create file drop folders and links from a CSV of presenters</summary>
+    <description><![CDATA[Upload a CSV of Theatre/Date/Start Time/Presenter Name/Presenter Email rows to
+create a nested folder per row, an upload-only "file drop" public share link for each folder
+(with a single expiry date/time applied to the whole batch), email each presenter their link,
+and download a copy of the CSV with the file drop link added. Optionally also creates shared
+root folders (Holding slides, fonts, schedules, all show, plus custom names) and a Nextcloud
+account per distinct theatre, scoped to its own theatre folder and the shared root folders.]]></description>
+    <version>1.1.0</version>
+    <licence>agpl</licence>
+    <author>Allan Sargeant</author>
+    <namespace>FileDropBatch</namespace>
+    <category>files</category>
+    <category>organization</category>
+    <bugs>https://github.com/</bugs>
+    <dependencies>
+        <php min-version="8.1"/>
+        <nextcloud min-version="27" max-version="31"/>
+    </dependencies>
+    <navigations>
+        <navigation>
+            <name>File Drop Batch</name>
+            <route>filedropbatch.page.index</route>
+            <icon>app.svg</icon>
+            <order>50</order>
+        </navigation>
+    </navigations>
+</info>

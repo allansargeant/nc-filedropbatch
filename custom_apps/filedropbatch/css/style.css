@@ -1,0 +1,97 @@
+.filedropbatch {
+    max-width: 900px;
+    margin: 20px;
+}
+
+.fdb-intro {
+    opacity: 0.8;
+    margin-bottom: 20px;
+}
+
+.fdb-field {
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    max-width: 400px;
+}
+
+.fdb-field label {
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+fieldset.fdb-field {
+    max-width: 480px;
+    border: 1px solid var(--color-border, #ddd);
+    border-radius: 4px;
+    padding: 10px 14px;
+}
+
+fieldset.fdb-field legend {
+    font-weight: bold;
+    padding: 0 4px;
+}
+
+.fdb-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: normal;
+    margin: 4px 0;
+}
+
+.fdb-hint {
+    font-size: 0.85em;
+    opacity: 0.7;
+    margin: 4px 0 0;
+}
+
+.fdb-error {
+    color: var(--color-error, #c9271e);
+    margin: 12px 0;
+    font-weight: bold;
+}
+
+.fdb-results {
+    margin-top: 24px;
+}
+
+#fdb-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+}
+
+#fdb-table th,
+#fdb-table td {
+    text-align: left;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--color-border, #ddd);
+    font-size: 0.9em;
+}
+
+.fdb-status-success,
+.fdb-status-created { color: var(--color-success, #2d7d46); font-weight: bold; }
+.fdb-status-partial,
+.fdb-status-existing { color: var(--color-warning, #b3822b); font-weight: bold; }
+.fdb-status-error { color: var(--color-error, #c9271e); font-weight: bold; }
+
+#fdb-download,
+#fdb-users-download {
+    display: inline-block;
+    margin: 8px 0 16px;
+}
+
+#fdb-users-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+}
+
+#fdb-users-table th,
+#fdb-users-table td {
+    text-align: left;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--color-border, #ddd);
+    font-size: 0.9em;
+}
