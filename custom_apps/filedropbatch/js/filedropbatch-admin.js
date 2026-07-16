@@ -57,6 +57,78 @@
         }
     });
 
+    const googleForm = document.getElementById('fdb-google-form');
+    const googleSaveButton = document.getElementById('fdb-google-save');
+    const googleMessageBox = document.getElementById('fdb-google-message');
+    const googleDisconnectButton = document.getElementById('fdb-google-disconnect');
+
+    function showGoogleMessage(text, isError) {
+        googleMessageBox.textContent = text;
+        googleMessageBox.hidden = !text;
+        googleMessageBox.className = isError ? 'fdb-error' : 'fdb-status-success';
+    }
+
+    (function showRedirectFlags() {
+        const params = new URLSearchParams(window.location.search);
+        if (params.has('google_error')) {
+            showGoogleMessage('Google connection failed: ' + params.get('google_error'), true);
+        } else if (params.has('google_connected')) {
+            showGoogleMessage('Google account connected.', false);
+        } else if (params.has('google_disconnected')) {
+            showGoogleMessage('Google account disconnected.', false);
+        }
+    })();
+
+    if (googleForm) {
+        googleForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            showGoogleMessage('', false);
+            googleSaveButton.disabled = true;
+
+            try {
+                const formData = new FormData(googleForm);
+                const response = await fetch(OC.generateUrl('/apps/filedropbatch/admin/google-settings'), {
+                    method: 'POST',
+                    headers: { requesttoken: OC.requestToken },
+                    body: formData,
+                });
+                const data = await response.json();
+                if (!response.ok) {
+                    showGoogleMessage(data.error || 'Could not save Google settings', true);
+                    return;
+                }
+                showGoogleMessage('Google settings saved.', false);
+                document.getElementById('fdb-google-client-secret').value = '';
+            } catch (e) {
+                showGoogleMessage('Network error: ' + e.message, true);
+            } finally {
+                googleSaveButton.disabled = false;
+            }
+        });
+    }
+
+    if (googleDisconnectButton) {
+        googleDisconnectButton.addEventListener('click', async () => {
+            googleDisconnectButton.disabled = true;
+            try {
+                const response = await fetch(OC.generateUrl('/apps/filedropbatch/google/disconnect'), {
+                    method: 'POST',
+                    headers: { requesttoken: OC.requestToken },
+                });
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    const data = await response.json();
+                    showGoogleMessage(data.error || 'Could not disconnect', true);
+                    googleDisconnectButton.disabled = false;
+                }
+            } catch (e) {
+                showGoogleMessage('Network error: ' + e.message, true);
+                googleDisconnectButton.disabled = false;
+            }
+        });
+    }
+
     syncButton.addEventListener('click', async () => {
         showMessage('');
         syncButton.disabled = true;

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OCA\FileDropBatch\Controller;
 
+use OCA\FileDropBatch\Service\GoogleAuthService;
 use OCA\FileDropBatch\Service\RcloneSyncService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
@@ -22,8 +23,18 @@ class AdminSettingsController extends Controller {
         IRequest $request,
         private IUserSession $userSession,
         private RcloneSyncService $syncService,
+        private GoogleAuthService $googleAuth,
     ) {
         parent::__construct($appName, $request);
+    }
+
+    public function saveGoogle(): DataResponse {
+        $clientId = trim((string)$this->request->getParam('google_client_id', ''));
+        $clientSecret = (string)$this->request->getParam('google_client_secret', '');
+
+        $this->googleAuth->saveClientCredentials($clientId, $clientSecret !== '' ? $clientSecret : null);
+
+        return new DataResponse(['google' => $this->googleAuth->getSettings()]);
     }
 
     public function save(): DataResponse {

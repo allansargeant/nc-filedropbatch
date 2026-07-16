@@ -14,7 +14,7 @@ Can also automatically mirror the whole base folder to a separate Nextcloud inst
 rclone over WebDAV once a batch's file-drop links have expired, for replicating collected
 files to a server taken to the event site. Every session (from a CSV or added manually)
 is tracked in a Sessions list where it can be edited, closed early, or removed.]]></description>
-    <version>1.3.0</version>
+    <version>1.4.0</version>
     <licence>agpl</licence>
     <author>Allan Sargeant</author>
     <namespace>FileDropBatch</namespace>

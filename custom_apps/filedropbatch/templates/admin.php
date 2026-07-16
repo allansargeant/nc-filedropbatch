@@ -85,4 +85,53 @@ Util::addStyle('filedropbatch', 'style');
     </div>
 
     <div id="fdb-admin-message" class="fdb-error" hidden></div>
+
+    <h2>File Drop Batch - Google Sheets</h2>
+    <p class="fdb-intro">
+        Connect a single Google account so anyone using this app can link a Google Sheet as an
+        alternative to uploading a CSV. The connected account needs read access to any sheet
+        someone links. Rows are matched across syncs by Theatre + Date + Start Time - a row
+        removed from the sheet automatically closes its session's file drop link immediately,
+        the same as clicking "Close now".
+    </p>
+
+    <form id="fdb-google-form">
+        <div class="fdb-field">
+            <label for="fdb-google-client-id">Client ID</label>
+            <input type="text" id="fdb-google-client-id" name="google_client_id"
+                   value="<?php p($_['google']['clientId']); ?>">
+        </div>
+
+        <div class="fdb-field">
+            <label for="fdb-google-client-secret">Client Secret</label>
+            <input type="password" id="fdb-google-client-secret" name="google_client_secret"
+                   placeholder="<?php p($_['google']['hasClientSecret'] ? '(unchanged)' : ''); ?>" autocomplete="new-password">
+            <p class="fdb-hint">Stored encrypted; leave blank to keep the current one.</p>
+        </div>
+
+        <div class="fdb-field">
+            <label>Redirect URI</label>
+            <input type="text" readonly value="<?php p($_['google']['redirectUri']); ?>"
+                   onclick="this.select();">
+            <p class="fdb-hint">Add this exact URI as an authorized redirect URI on the OAuth Client in Google Cloud Console.</p>
+        </div>
+
+        <button type="submit" class="primary" id="fdb-google-save">Save Google settings</button>
+    </form>
+
+    <div id="fdb-google-connection" style="margin-top: 12px;" data-connect-url="<?php p($_['google']['connectUrl']); ?>">
+        <?php if ($_['google']['connected']): ?>
+            <p class="fdb-status-success">
+                Connected<?php if ($_['google']['accountEmail'] !== ''): ?> as <?php p($_['google']['accountEmail']); ?><?php endif; ?>
+            </p>
+            <button type="button" id="fdb-google-disconnect">Disconnect Google account</button>
+        <?php else: ?>
+            <a class="button primary" id="fdb-google-connect" href="<?php p($_['google']['connectUrl']); ?>">
+                Connect Google account
+            </a>
+            <p class="fdb-hint">Save a Client ID and Client Secret above first.</p>
+        <?php endif; ?>
+    </div>
+
+    <div id="fdb-google-message" class="fdb-error" hidden></div>
 </div>

@@ -20,6 +20,7 @@ Optionally, it can also:
 - create a Nextcloud account per distinct theatre in the CSV, scoped to its own theatre folder plus the shared root folders (not other theatres), with a generated password saved to a downloadable CSV. Creating accounts is restricted to admins/subadmins.
 - once a batch's file-drop links pass their expiry, automatically mirror the whole base folder to a separate Nextcloud instance (e.g. a server taken to the event site) via `rclone` over WebDAV - see [Site-server sync](#site-server-sync) below.
 - track every session (from a CSV or added manually) in a persistent Sessions list, where you can edit its details, close its link early, or remove it - see [Managing sessions](#managing-sessions) below.
+- build a show directly in the browser instead of preparing a CSV, or link a Google Sheet and keep it live-synced - see [Building a show without a CSV](#building-a-show-without-a-csv) below.
 
 ## The upload page
 
@@ -56,6 +57,20 @@ Every session - whether it came from a CSV row or was added one at a time - is t
 - **Delete** only removes the session from this list. The real folder, anything uploaded into it, and its share (if not separately closed) are left exactly as they are - if you actually want the folder gone, do that separately in Files.
 
 "Add session" on the same page creates a single session outside of a CSV, through the identical folder/share/email logic as a CSV row (including its own expiry date, since Nextcloud's link expiry is set per-share, not editable after the fact via this app).
+
+A session created or last-touched by a linked Google Sheet can also be closed *for you*, automatically, the moment its row disappears from that sheet - see [Building a show without a CSV](#building-a-show-without-a-csv) above.
+
+## Building a show without a CSV
+
+The main page's "How do you want to build this show?" switcher offers two alternatives to uploading a CSV file:
+
+- **Enter manually** - the same fields a CSV row would have (Theatre, Date, Start time, Presenter name, Presenter email), added a row at a time in the browser and submitted together as one show. Uses the exact same folder/share/email pipeline as a CSV upload - there's no behavioral difference, just a different way to get the rows in.
+- **Link Google Sheet** - point the app at a Google Sheet with the same five columns, and it stays synced: a background job re-checks it roughly every 20 minutes (plus a "Sync now" button for on-demand runs), and rows are matched across syncs by **Theatre + Date + Start Time** rather than any hidden ID column, so:
+  - a presenter name or email changed on an existing row updates that session (moving its folder if the name or slot changed - the file-drop link itself keeps working, same as a manual edit);
+  - a wholly new Theatre+Date+Start Time combination creates a new session, exactly like a new CSV row;
+  - **a row removed from the sheet automatically closes that session's file-drop link immediately - no confirmation, no undo.** This is deliberately more aggressive than anything else in this app (deleting a session elsewhere never touches the real folder/share) - an accidental spreadsheet row deletion kills a live upload link the moment the next sync runs. Turn off "Keep this sheet synced automatically" on a linked sheet if this isn't what you want for it.
+
+**Setup (once, by an admin):** in Nextcloud admin Settings → File Drop Batch, under "Google Sheets", create an OAuth 2.0 Client ID in [Google Cloud Console](https://console.cloud.google.com/) (any project with the Google Sheets API enabled), add the "Redirect URI" shown on that settings page as an authorized redirect URI on the client, paste the Client ID/Secret in, save, then click "Connect Google account" and complete Google's consent screen. This is a single, **instance-wide** connection (like the rclone remote credential) - not per-user - so the connected account needs read access to every sheet anyone links, and any signed-in user can then link a sheet from the main page without needing their own Google OAuth setup.
 
 ## Site-server sync
 

@@ -6,6 +6,7 @@ namespace OCA\FileDropBatch\Controller;
 
 use OCA\FileDropBatch\AppInfo\Application;
 use OCA\FileDropBatch\Service\BatchProcessorService;
+use OCA\FileDropBatch\Service\CsvReader;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -24,6 +25,7 @@ class BatchController extends Controller {
         private IGroupManager $groupManager,
         private IConfig $config,
         private BatchProcessorService $processor,
+        private CsvReader $csvReader,
     ) {
         parent::__construct($appName, $request);
     }
@@ -40,6 +42,51 @@ class BatchController extends Controller {
             return new DataResponse(['error' => 'No CSV file was uploaded'], Http::STATUS_BAD_REQUEST);
         }
 
+        try {
+            $inputRows = $this->csvReader->read($uploaded['tmp_name']);
+        } catch (\RuntimeException $e) {
+            return new DataResponse(['error' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+        }
+
+        return $this->runBatch($user, $inputRows);
+    }
+
+    /**
+     * Same pipeline as process(), but for a show built row-by-row in the
+     * browser instead of an uploaded CSV file - "rows" is a JSON-encoded
+     * array of {theatre, date, startTime, presenterName, presenterEmail}.
+     */
+    #[NoAdminRequired]
+    public function processManual(): DataResponse {
+        $user = $this->userSession->getUser();
+        if ($user === null) {
+            return new DataResponse(['error' => 'Not logged in'], Http::STATUS_UNAUTHORIZED);
+        }
+
+        $rowsJson = (string)$this->request->getParam('rows', '');
+        $decoded = json_decode($rowsJson, true);
+        if (!is_array($decoded) || $decoded === []) {
+            return new DataResponse(['error' => 'At least one session row is required'], Http::STATUS_BAD_REQUEST);
+        }
+
+        $inputRows = [];
+        foreach (array_values($decoded) as $i => $entry) {
+            $entry = is_array($entry) ? $entry : [];
+            $inputRows[] = [
+                '_rowNumber' => (string)($i + 2), // +2: row 1 is the "header" for display parity with a CSV
+                'date' => trim((string)($entry['date'] ?? '')),
+                'theatre' => trim((string)($entry['theatre'] ?? '')),
+                'start time' => trim((string)($entry['startTime'] ?? '')),
+                'presenter name' => trim((string)($entry['presenterName'] ?? '')),
+                'presenter email' => trim((string)($entry['presenterEmail'] ?? '')),
+            ];
+        }
+
+        return $this->runBatch($user, $inputRows);
+    }
+
+    /** @param array<int, array<string, string>> $inputRows */
+    private function runBatch(IUser $user, array $inputRows): DataResponse {
         $expiryRaw = (string)$this->request->getParam('expiry_date', '');
         $baseFolder = trim((string)$this->request->getParam('base_folder', 'File Drops'));
         if ($baseFolder === '') {
@@ -61,18 +108,14 @@ class BatchController extends Controller {
             return new DataResponse(['error' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
         }
 
-        try {
-            $result = $this->processor->processBatch(
-                $user->getUID(),
-                $uploaded['tmp_name'],
-                $expiry,
-                $baseFolder,
-                $rootFolderNames,
-                $createUsers,
-            );
-        } catch (\RuntimeException $e) {
-            return new DataResponse(['error' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
-        }
+        $result = $this->processor->processBatch(
+            $user->getUID(),
+            $inputRows,
+            $expiry,
+            $baseFolder,
+            $rootFolderNames,
+            $createUsers,
+        );
 
         $this->config->setUserValue($user->getUID(), Application::APP_ID, 'base_folder', $baseFolder);
 

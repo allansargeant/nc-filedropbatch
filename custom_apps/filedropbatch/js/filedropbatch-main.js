@@ -19,6 +19,21 @@
     const addSessionForm = document.getElementById('fdb-add-session-form');
     const addSessionCancel = document.getElementById('fdb-add-session-cancel');
 
+    const modeCsvRadio = document.getElementById('fdb-mode-csv');
+    const modeManualRadio = document.getElementById('fdb-mode-manual');
+    const modeSheetRadio = document.getElementById('fdb-mode-sheet');
+    const csvModeBox = document.getElementById('fdb-csv-mode');
+    const manualModeBox = document.getElementById('fdb-manual-mode');
+    const sheetModeBox = document.getElementById('fdb-sheet-mode');
+    const batchOptionsBox = document.getElementById('fdb-batch-options');
+    const csvFileInput = document.getElementById('fdb-csv-file');
+    const manualRowsTableBody = document.querySelector('#fdb-manual-rows-table tbody');
+    const manualAddRowButton = document.getElementById('fdb-manual-add-row');
+
+    const sheetLinkForm = document.getElementById('fdb-sheet-link-form');
+    const sheetsErrorBox = document.getElementById('fdb-sheets-error');
+    const sheetsTableBody = document.querySelector('#fdb-sheets-table tbody');
+
     function showError(message) {
         errorBox.textContent = message;
         errorBox.hidden = false;
@@ -116,6 +131,65 @@
         usersResultsBox.hidden = false;
     }
 
+    // --- Mode switcher (Upload CSV / Enter manually) --------------------------
+
+    function buildManualRow() {
+        const tr = document.createElement('tr');
+        const fields = ['theatre', 'date', 'startTime', 'presenterName', 'presenterEmail'];
+        const placeholders = { theatre: 'Globe', date: '2026-08-01', startTime: '17:00', presenterName: 'A. Smith', presenterEmail: 'a.smith@example.com' };
+        fields.forEach((field) => {
+            const td = document.createElement('td');
+            const input = document.createElement('input');
+            input.type = field === 'presenterEmail' ? 'email' : 'text';
+            input.dataset.field = field;
+            input.placeholder = placeholders[field];
+            td.appendChild(input);
+            tr.appendChild(td);
+        });
+
+        const actionsTd = document.createElement('td');
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.textContent = 'Remove';
+        removeBtn.addEventListener('click', () => tr.remove());
+        actionsTd.appendChild(removeBtn);
+        tr.appendChild(actionsTd);
+
+        return tr;
+    }
+
+    function collectManualRows() {
+        return Array.from(manualRowsTableBody.querySelectorAll('tr')).map((tr) => {
+            const row = {};
+            tr.querySelectorAll('input[data-field]').forEach((input) => {
+                row[input.dataset.field] = input.value.trim();
+            });
+            return row;
+        }).filter((row) => Object.values(row).some((v) => v !== ''));
+    }
+
+    function setMode(mode) {
+        const isManual = mode === 'manual';
+        const isSheet = mode === 'sheet';
+        csvModeBox.hidden = isManual || isSheet;
+        manualModeBox.hidden = !isManual;
+        sheetModeBox.hidden = !isSheet;
+        batchOptionsBox.hidden = isSheet;
+        csvFileInput.required = !isManual && !isSheet;
+        if (isManual && manualRowsTableBody.children.length === 0) {
+            manualRowsTableBody.appendChild(buildManualRow());
+        }
+    }
+
+    modeCsvRadio.addEventListener('change', () => setMode('csv'));
+    modeManualRadio.addEventListener('change', () => setMode('manual'));
+    if (modeSheetRadio) {
+        modeSheetRadio.addEventListener('change', () => setMode('sheet'));
+    }
+    manualAddRowButton.addEventListener('click', () => {
+        manualRowsTableBody.appendChild(buildManualRow());
+    });
+
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
         clearError();
@@ -123,13 +197,31 @@
         usersResultsBox.hidden = true;
         submitButton.disabled = true;
 
+        const isManual = modeManualRadio.checked;
+
         try {
-            const formData = new FormData(form);
-            const response = await fetch(OC.generateUrl('/apps/filedropbatch/batch'), {
-                method: 'POST',
-                headers: { requesttoken: OC.requestToken },
-                body: formData,
-            });
+            let response;
+            if (isManual) {
+                const rows = collectManualRows();
+                if (rows.length === 0) {
+                    showError('Add at least one session row');
+                    return;
+                }
+                const formData = new FormData(form);
+                formData.set('rows', JSON.stringify(rows));
+                response = await fetch(OC.generateUrl('/apps/filedropbatch/batch/manual'), {
+                    method: 'POST',
+                    headers: { requesttoken: OC.requestToken },
+                    body: formData,
+                });
+            } else {
+                const formData = new FormData(form);
+                response = await fetch(OC.generateUrl('/apps/filedropbatch/batch'), {
+                    method: 'POST',
+                    headers: { requesttoken: OC.requestToken },
+                    body: formData,
+                });
+            }
 
             const data = await response.json();
             if (!response.ok) {
@@ -342,5 +434,190 @@
         }
     });
 
+    // --- Linked Google Sheets -------------------------------------------------
+
+    function showSheetsError(message) {
+        if (!sheetsErrorBox) {
+            return;
+        }
+        sheetsErrorBox.textContent = message;
+        sheetsErrorBox.hidden = !message;
+    }
+
+    async function loadSheets() {
+        if (!sheetsTableBody) {
+            return;
+        }
+        try {
+            const data = await apiCall(OC.generateUrl('/apps/filedropbatch/sheets'), 'GET');
+            renderSheetsTable(data.sheets || []);
+        } catch (e) {
+            showSheetsError('Could not load linked sheets: ' + e.message);
+        }
+    }
+
+    function renderSheetsTable(sheets) {
+        sheetsTableBody.replaceChildren();
+        sheets.forEach((sheet) => {
+            sheetsTableBody.appendChild(buildSheetDisplayRow(sheet));
+        });
+    }
+
+    function lastSyncCell(sheet) {
+        const td = document.createElement('td');
+        if (!sheet.lastSyncedAt) {
+            td.textContent = 'Never synced';
+            return td;
+        }
+        const span = document.createElement('span');
+        span.className = 'fdb-status-' + (sheet.lastSyncStatus === 'success' ? 'success' : (sheet.lastSyncStatus === 'partial' ? 'partial' : 'error'));
+        span.textContent = `${sheet.lastSyncedAt} - ${sheet.lastSyncStatus}`;
+        td.appendChild(span);
+        if (sheet.lastSyncMessage) {
+            td.appendChild(document.createElement('br'));
+            td.appendChild(document.createTextNode(sheet.lastSyncMessage));
+        }
+        return td;
+    }
+
+    function buildSheetDisplayRow(sheet) {
+        const tr = document.createElement('tr');
+        tr.dataset.id = sheet.id;
+
+        tr.appendChild(cell(sheet.name));
+        tr.appendChild(cell(sheet.baseFolder));
+        tr.appendChild(cell(sheet.expiryDate));
+        tr.appendChild(cell(sheet.syncEnabled ? 'On' : 'Off'));
+        tr.appendChild(lastSyncCell(sheet));
+
+        const actionsTd = document.createElement('td');
+        actionsTd.classList.add('fdb-actions');
+
+        const syncBtn = document.createElement('button');
+        syncBtn.type = 'button';
+        syncBtn.textContent = 'Sync now';
+        syncBtn.addEventListener('click', async () => {
+            showSheetsError('');
+            syncBtn.disabled = true;
+            syncBtn.textContent = 'Syncing...';
+            try {
+                await apiCall(OC.generateUrl(`/apps/filedropbatch/sheets/${sheet.id}/sync-now`), 'POST');
+                loadSheets();
+                loadSessions();
+            } catch (e) {
+                showSheetsError('Sync failed: ' + e.message);
+                syncBtn.disabled = false;
+                syncBtn.textContent = 'Sync now';
+            }
+        });
+        actionsTd.appendChild(syncBtn);
+
+        const editBtn = document.createElement('button');
+        editBtn.type = 'button';
+        editBtn.textContent = 'Edit';
+        editBtn.addEventListener('click', () => {
+            tr.replaceWith(buildSheetEditRow(sheet));
+        });
+        actionsTd.appendChild(editBtn);
+
+        const unlinkBtn = document.createElement('button');
+        unlinkBtn.type = 'button';
+        unlinkBtn.textContent = 'Unlink';
+        unlinkBtn.addEventListener('click', async () => {
+            if (!confirm(`Unlink "${sheet.name}"? Sessions it already created are left untouched - this only stops future syncing.`)) {
+                return;
+            }
+            try {
+                await apiCall(OC.generateUrl(`/apps/filedropbatch/sheets/${sheet.id}`), 'DELETE');
+                loadSheets();
+            } catch (e) {
+                showSheetsError('Could not unlink: ' + e.message);
+            }
+        });
+        actionsTd.appendChild(unlinkBtn);
+
+        tr.appendChild(actionsTd);
+        return tr;
+    }
+
+    function buildSheetEditRow(sheet) {
+        const tr = document.createElement('tr');
+        tr.dataset.id = sheet.id;
+
+        const name = editableCell(sheet.name);
+        const baseFolder = editableCell(sheet.baseFolder);
+        const expiry = editableCell(sheet.expiryDate);
+
+        tr.appendChild(name.td);
+        tr.appendChild(baseFolder.td);
+        tr.appendChild(expiry.td);
+
+        const syncTd = document.createElement('td');
+        const syncCheckbox = document.createElement('input');
+        syncCheckbox.type = 'checkbox';
+        syncCheckbox.checked = !!sheet.syncEnabled;
+        syncTd.appendChild(syncCheckbox);
+        tr.appendChild(syncTd);
+
+        tr.appendChild(cell(''));
+
+        const actionsTd = document.createElement('td');
+        actionsTd.classList.add('fdb-actions');
+
+        const saveBtn = document.createElement('button');
+        saveBtn.type = 'button';
+        saveBtn.classList.add('primary');
+        saveBtn.textContent = 'Save';
+        saveBtn.addEventListener('click', async () => {
+            showSheetsError('');
+            const body = new URLSearchParams({
+                name: name.input.value,
+                base_folder: baseFolder.input.value,
+                expiry_date: expiry.input.value,
+                sync_enabled: syncCheckbox.checked ? '1' : '',
+            });
+            try {
+                await apiCall(OC.generateUrl(`/apps/filedropbatch/sheets/${sheet.id}`), 'PUT', body);
+                loadSheets();
+            } catch (e) {
+                showSheetsError('Could not save: ' + e.message);
+            }
+        });
+        actionsTd.appendChild(saveBtn);
+
+        const cancelBtn = document.createElement('button');
+        cancelBtn.type = 'button';
+        cancelBtn.textContent = 'Cancel';
+        cancelBtn.addEventListener('click', () => {
+            tr.replaceWith(buildSheetDisplayRow(sheet));
+        });
+        actionsTd.appendChild(cancelBtn);
+
+        tr.appendChild(actionsTd);
+        return tr;
+    }
+
+    if (sheetLinkForm) {
+        sheetLinkForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            showSheetsError('');
+
+            const formData = new FormData(sheetLinkForm);
+            const body = new URLSearchParams();
+            for (const [key, value] of formData.entries()) {
+                body.append(key, value);
+            }
+
+            try {
+                await apiCall(OC.generateUrl('/apps/filedropbatch/sheets'), 'POST', body);
+                sheetLinkForm.reset();
+                loadSheets();
+            } catch (e) {
+                showSheetsError('Could not link sheet: ' + e.message);
+            }
+        });
+    }
+
     loadSessions();
+    loadSheets();
 })();

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OCA\FileDropBatch\Service;
 
-use OCA\FileDropBatch\Db\Batch;
 use OCA\FileDropBatch\Db\BatchMapper;
 use OCA\FileDropBatch\Db\Session;
 use OCA\FileDropBatch\Db\SessionMapper;
@@ -18,7 +17,6 @@ class BatchProcessorService {
         | Constants::PERMISSION_DELETE;
 
     public function __construct(
-        private CsvReader $csvReader,
         private CsvWriter $csvWriter,
         private FolderService $folderService,
         private ShareService $shareService,
@@ -61,23 +59,24 @@ class BatchProcessorService {
     }
 
     /**
+     * @param array<int, array<string, string>> $inputRows already-parsed rows
+     *   (via CsvReader::read()/parseRows()) - the caller owns getting from
+     *   whatever source (uploaded file, manually-built rows, a Google Sheet)
+     *   to this shape, so this method doesn't care where rows came from.
      * @param string[] $rootFolderNames predefined/custom folder names created once under $baseFolder
      * @return array{
      *   summary: array<string, int>, rows: array<int, array<string, mixed>>, csv: string,
      *   userSummary: array<string, int>, users: array<int, array<string, mixed>>, usersCsv: string
      * }
-     * @throws \RuntimeException if the CSV itself is malformed (missing headers, unreadable).
      */
     public function processBatch(
         string $userId,
-        string $csvPath,
+        array $inputRows,
         \DateTimeInterface $expiry,
         string $baseFolder,
         array $rootFolderNames = [],
         bool $createUsers = false,
     ): array {
-        $inputRows = $this->csvReader->read($csvPath);
-
         $rootFolders = $this->createRootFolders($userId, $baseFolder, $rootFolderNames);
 
         $userResults = [];

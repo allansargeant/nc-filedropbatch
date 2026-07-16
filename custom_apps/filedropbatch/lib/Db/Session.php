@@ -35,6 +35,8 @@ use OCP\AppFramework\Db\Entity;
  * @method void setCreatedAt(\DateTime $createdAt)
  * @method \DateTime|null getClosedAt()
  * @method void setClosedAt(?\DateTime $closedAt)
+ * @method int|null getSheetId()
+ * @method void setSheetId(?int $sheetId)
  */
 class Session extends Entity {
     protected $batchId;
@@ -51,6 +53,7 @@ class Session extends Entity {
     protected $emailSent;
     protected $createdAt;
     protected $closedAt;
+    protected $sheetId;
 
     public const STATUS_OPEN = 'open';
     public const STATUS_CLOSED = 'closed';
@@ -60,5 +63,6 @@ class Session extends Entity {
         $this->addType('emailSent', 'boolean');
         $this->addType('createdAt', 'datetime');
         $this->addType('closedAt', 'datetime');
+        $this->addType('sheetId', 'integer');
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OCA\FileDropBatch\Controller;
 
 use OCA\FileDropBatch\AppInfo\Application;
+use OCA\FileDropBatch\Service\GoogleAuthService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
@@ -25,6 +26,7 @@ class PageController extends Controller {
         private IConfig $config,
         private IUserSession $userSession,
         private IGroupManager $groupManager,
+        private GoogleAuthService $googleAuth,
     ) {
         parent::__construct($appName, $request);
     }
@@ -44,6 +46,7 @@ class PageController extends Controller {
             'baseFolder' => $baseFolder,
             'predefinedRootFolders' => self::PREDEFINED_ROOT_FOLDERS,
             'canCreateUsers' => $user !== null && $this->canManageTheatreUsers($user),
+            'googleConnected' => $this->googleAuth->isConnected(),
         ]);
     }
 

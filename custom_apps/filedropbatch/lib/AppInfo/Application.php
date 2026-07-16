@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OCA\FileDropBatch\AppInfo;
 
 use OCA\FileDropBatch\BackgroundJob\SyncExpiredBatchesJob;
+use OCA\FileDropBatch\BackgroundJob\SyncGoogleSheetsJob;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
@@ -27,5 +28,6 @@ class Application extends App implements IBootstrap {
         // via IJobList - it's a no-op if already registered, safe to call
         // on every request.
         $context->getAppContainer()->get(IJobList::class)->add(SyncExpiredBatchesJob::class);
+        $context->getAppContainer()->get(IJobList::class)->add(SyncGoogleSheetsJob::class);
     }
 }

@@ -29,47 +29,67 @@ class CsvReader {
         }
 
         try {
-            $headerRow = fgetcsv($handle);
-            if ($headerRow === false) {
-                throw new \RuntimeException('The CSV file is empty');
-            }
-
-            $headerRow = $this->stripBom($headerRow);
-            $columnMap = $this->mapColumns($headerRow);
-
-            $rows = [];
-            $rowNumber = 1;
+            $lines = [];
             while (($line = fgetcsv($handle)) !== false) {
-                $rowNumber++;
-
-                // Skip fully blank lines (common trailing newline in exported CSVs).
-                if ($line === [null] || $line === ['']) {
-                    continue;
-                }
-
-                $row = ['_rowNumber' => (string)$rowNumber];
-                foreach ($columnMap as $canonical => $index) {
-                    $row[$canonical] = trim((string)($line[$index] ?? ''));
-                }
-                $rows[] = $row;
+                $lines[] = $line;
             }
-
-            return $rows;
         } finally {
             fclose($handle);
         }
+
+        return $this->parseRows($lines);
     }
 
-    /** @param string[] $headerRow */
+    /**
+     * Same validation/row-shaping as read(), but for rows already parsed
+     * elsewhere (a manually-built show, or a Google Sheets API response) -
+     * $lines is a list of plain arrays, the first being the header row.
+     *
+     * @param array<int, array<int, mixed>> $lines
+     * @return array<int, array<string, string>>
+     * @throws \RuntimeException if required headers are missing or there are no rows.
+     */
+    public function parseRows(array $lines): array {
+        if ($lines === []) {
+            throw new \RuntimeException('The CSV is empty');
+        }
+
+        $headerRow = $this->stripBom($lines[0]);
+        $columnMap = $this->mapColumns($headerRow);
+
+        $rows = [];
+        $rowNumber = 1;
+        for ($i = 1; $i < count($lines); $i++) {
+            $rowNumber++;
+            $line = $lines[$i];
+
+            // Skip fully blank lines - a trailing newline in an exported CSV
+            // yields [null], and the Google Sheets API omits trailing empty
+            // cells entirely, so a blank row there arrives as [].
+            if ($line === [] || $line === [null] || $line === ['']) {
+                continue;
+            }
+
+            $row = ['_rowNumber' => (string)$rowNumber];
+            foreach ($columnMap as $canonical => $index) {
+                $row[$canonical] = trim((string)($line[$index] ?? ''));
+            }
+            $rows[] = $row;
+        }
+
+        return $rows;
+    }
+
+    /** @param array<int, mixed> $headerRow */
     private function stripBom(array $headerRow): array {
         if (isset($headerRow[0])) {
-            $headerRow[0] = preg_replace('/^\xEF\xBB\xBF/', '', $headerRow[0]) ?? $headerRow[0];
+            $headerRow[0] = preg_replace('/^\xEF\xBB\xBF/', '', (string)$headerRow[0]) ?? $headerRow[0];
         }
         return $headerRow;
     }
 
     /**
-     * @param string[] $headerRow
+     * @param array<int, mixed> $headerRow
      * @return array<string, int> canonical header name => column index
      */
     private function mapColumns(array $headerRow): array {
