@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>File Drop Batch - admin settings preview</title>
+<link rel="stylesheet" href="../../custom_apps/filedropbatch/css/style.css">
+<style>
+  html, body {
+    margin: 0;
+    background: #14181c;
+    color: #ebebeb;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .nc-topbar {
+    background: #14181c;
+    border-bottom: 1px solid #2a2f35;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: bold;
+  }
+  .nc-topbar .dot {
+    width: 10px; height: 10px; border-radius: 50%; background: #0082c9;
+  }
+  .nc-topbar .path {
+    opacity: 0.6;
+    font-weight: normal;
+  }
+  a { color: #6cb6ea; }
+</style>
+</head>
+<body>
+  <div class="nc-topbar">
+    <span class="dot"></span>
+    <span>Nextcloud</span>
+    <span class="path">&rsaquo; Administration settings &rsaquo; File Drop Batch</span>
+  </div>
+
+<div id="filedropbatch-admin" class="filedropbatch section">
+    <h2>File Drop Batch - site-server sync</h2>
+    <p class="fdb-intro">
+        Once a batch's file-drop links pass their expiry date, this can automatically mirror the whole
+        base folder (via <code>rclone</code> over WebDAV) to a separate Nextcloud instance - e.g. a server
+        taken to the event site with no reliable link back here. Requires <code>rclone</code> installed on
+        this server and PHP allowed to run external processes.
+    </p>
+
+    <form>
+        <div class="fdb-field">
+            <label for="fdb-remote-url">Remote Nextcloud URL</label>
+            <input type="url" id="fdb-remote-url" value="https://site-server.example">
+        </div>
+
+        <div class="fdb-field">
+            <label for="fdb-remote-user">Remote username</label>
+            <input type="text" id="fdb-remote-user" value="site-mirror">
+        </div>
+
+        <div class="fdb-field">
+            <label for="fdb-remote-password">Remote app password</label>
+            <input type="password" id="fdb-remote-password" placeholder="(unchanged)" autocomplete="new-password">
+            <p class="fdb-hint">
+                Create a dedicated app password on the remote instance (Settings &rsaquo; Security) rather
+                than using that account's real login password. Stored encrypted; leave blank to keep the
+                current one.
+            </p>
+        </div>
+
+        <div class="fdb-field">
+            <label for="fdb-remote-base-path">Remote base path (optional)</label>
+            <input type="text" id="fdb-remote-base-path" value="Event Mirror">
+            <p class="fdb-hint">The base folder is created under this path on the remote instance (its own Files root if left blank).</p>
+        </div>
+
+        <div class="fdb-field">
+            <label for="fdb-rclone-binary">rclone binary path</label>
+            <input type="text" id="fdb-rclone-binary" value="rclone">
+        </div>
+
+        <div class="fdb-field">
+            <label for="fdb-local-base-url">Local WebDAV base URL override (optional)</label>
+            <input type="url" id="fdb-local-base-url" placeholder="auto-detected if blank">
+            <p class="fdb-hint">Set this if the scheduled background job can't reliably detect this instance's own URL.</p>
+        </div>
+
+        <div class="fdb-field">
+            <label class="fdb-checkbox">
+                <input type="checkbox" checked>
+                Automatically sync once a batch's links have expired
+            </label>
+            <p class="fdb-hint">Runs on Nextcloud's own background job schedule (roughly every 15 minutes). The button below always works regardless of this setting.</p>
+        </div>
+
+        <button type="submit" class="primary">Save settings</button>
+        <button type="button">Sync now</button>
+    </form>
+
+    <div class="fdb-hint" style="margin-top: 12px;">
+        Last sync: 2026-09-01T03:00:04+00:00 -
+        <span class="fdb-status-success">success</span>
+    </div>
+
+    <h2>File Drop Batch - Google Sheets</h2>
+    <p class="fdb-intro">
+        Connect a single Google account so anyone using this app can link a Google Sheet as an
+        alternative to uploading a CSV. The connected account needs read access to any sheet
+        someone links. Rows are matched across syncs by Theatre + Date + Start Time - a row
+        removed from the sheet automatically closes its session's file drop link immediately,
+        the same as clicking "Close now".
+    </p>
+
+    <form>
+        <div class="fdb-field">
+            <label for="fdb-google-client-id">Client ID</label>
+            <input type="text" id="fdb-google-client-id" value="123456789012-abcdefghijklmnopqrstuvwxyz012345.apps.googleusercontent.com">
+        </div>
+
+        <div class="fdb-field">
+            <label for="fdb-google-client-secret">Client Secret</label>
+            <input type="password" id="fdb-google-client-secret" placeholder="(unchanged)" autocomplete="new-password">
+            <p class="fdb-hint">Stored encrypted; leave blank to keep the current one.</p>
+        </div>
+
+        <div class="fdb-field">
+            <label>Redirect URI</label>
+            <input type="text" readonly value="https://cloud.example.org/index.php/apps/filedropbatch/google/callback">
+            <p class="fdb-hint">Add this exact URI as an authorized redirect URI on the OAuth Client in Google Cloud Console.</p>
+        </div>
+
+        <button type="submit" class="primary">Save Google settings</button>
+    </form>
+
+    <div style="margin-top: 12px;">
+        <p class="fdb-status-success">Connected as production-sync@example-events.iam.gserviceaccount.com</p>
+        <button type="button">Disconnect Google account</button>
+    </div>
+</div>
+</body>
+</html>

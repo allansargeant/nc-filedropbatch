@@ -5,28 +5,37 @@
 > and the visuals in this README. Review it yourself before relying on it in production,
 > same as you would for any code.
 
-A Nextcloud app for theatre/event production teams. Upload a CSV of sessions and it will:
+A Nextcloud app for theatre/event production teams. Build a show - from a CSV, entered by hand in the
+browser, or synced live from a Google Sheet - and it will:
 
 ![Architecture: CSV in, folders/shares/accounts out](docs/architecture.svg)
 
-- create a nested folder per row (`Theatre / Date / "Start Time - Presenter"`),
+- create a nested folder per session (`Theatre / Date / "Start Time - Presenter"`),
 - create an upload-only "file drop" public link for each folder, with a single expiry date applied to the whole batch,
 - email each presenter their link,
-- hand back the same CSV with a `File Drop Link` column added.
+- hand back a CSV with a `File Drop Link` column added, when building from a CSV.
 
 Optionally, it can also:
 
 - create a set of shared root folders (`Holding slides`, `fonts`, `schedules`, `all show`, plus custom names) once at the top of the batch, and
-- create a Nextcloud account per distinct theatre in the CSV, scoped to its own theatre folder plus the shared root folders (not other theatres), with a generated password saved to a downloadable CSV. Creating accounts is restricted to admins/subadmins.
+- create a Nextcloud account per distinct theatre, scoped to its own theatre folder plus the shared root folders (not other theatres), with a generated password saved to a downloadable CSV. Creating accounts is restricted to admins/subadmins.
 - once a batch's file-drop links pass their expiry, automatically mirror the whole base folder to a separate Nextcloud instance (e.g. a server taken to the event site) via `rclone` over WebDAV - see [Site-server sync](#site-server-sync) below.
-- track every session (from a CSV or added manually) in a persistent Sessions list, where you can edit its details, close its link early, or remove it - see [Managing sessions](#managing-sessions) below.
-- build a show directly in the browser instead of preparing a CSV, or link a Google Sheet and keep it live-synced - see [Building a show without a CSV](#building-a-show-without-a-csv) below.
+- track every session in a persistent Sessions list, where you can edit its details, close its link early, or remove it - see [Managing sessions](#managing-sessions) below.
+- build a show directly in the browser instead of preparing a CSV, or link a Google Sheet and keep it live-synced, with a row's removal from the sheet automatically closing its session - see [Building a show without a CSV](#building-a-show-without-a-csv) below.
 
 ## The upload page
 
 ![The upload form and results tables, with sample data](docs/screenshots/app-preview.png)
 
 *A static mockup built from the app's real CSS/markup with illustrative sample data (not a live capture) - see [`docs/mockups/app-preview.html`](docs/mockups/app-preview.html).*
+
+![The "Link Google Sheet" mode, with a linked-sheets list and sync status](docs/screenshots/sheets-preview.png)
+
+*Same mockup approach, showing the Google Sheets mode - see [`docs/mockups/sheets-preview.html`](docs/mockups/sheets-preview.html).*
+
+![Admin settings: site-server sync and Google Sheets connection](docs/screenshots/admin-settings-preview.png)
+
+*The one-time admin setup screen for both the rclone remote and the Google OAuth connection - see [`docs/mockups/admin-settings-preview.html`](docs/mockups/admin-settings-preview.html).*
 
 ## Input CSV format
 
@@ -36,13 +45,41 @@ Date, Theatre, Start Time, presenter name, presenter email
 
 ## Installing
 
-Copy (or symlink) `custom_apps/filedropbatch` into your Nextcloud instance's `custom_apps` (or `apps`) directory, then:
+**Requirements:** PHP 8.1+ and Nextcloud 27-31 (see `<dependencies>` in `appinfo/info.xml`). No Composer
+dependencies at all - the app only uses Nextcloud's built-in OCP APIs (`IRootFolder`, `Share\IManager`,
+`IUserManager`, `IMailer`, `IClientService`). Two features are entirely optional and need nothing extra
+if you don't use them:
 
-```
-occ app:enable filedropbatch
-```
+- **Site-server sync** needs `rclone` installed on the server and PHP allowed to spawn external processes (`proc_open`) - see [Site-server sync](#site-server-sync).
+- **Google Sheets sync** needs a Google Cloud project with the Sheets API enabled and an OAuth 2.0 Client ID/Secret - see [Building a show without a CSV](#building-a-show-without-a-csv).
 
-The app needs no Composer dependencies - it only uses Nextcloud's built-in OCP APIs (`IRootFolder`, `Share\IManager`, `IUserManager`, `IMailer`).
+Neither is required for the core CSV/manual-entry/file-drop/session-management functionality.
+
+### Option A - install a release (recommended)
+
+1. Download `filedropbatch-<version>.tar.gz` from the [Releases page](https://github.com/allansargeant/nc-filedropbatch/releases).
+2. Extract it into your Nextcloud instance's app directory - it already contains the correct `filedropbatch/` top-level folder:
+   ```
+   tar -xzf filedropbatch-<version>.tar.gz -C /path/to/nextcloud/custom_apps/
+   ```
+3. Make sure the web server owns the extracted files, e.g. `chown -R www-data:www-data /path/to/nextcloud/custom_apps/filedropbatch`.
+4. Enable it, either from **Settings → Apps** in the Nextcloud web UI, or via `occ`:
+   ```
+   occ app:enable filedropbatch
+   ```
+
+### Option B - install from source
+
+Clone this repository and copy (or symlink) `custom_apps/filedropbatch` into your Nextcloud instance's
+`custom_apps` (or `apps`) directory, then run the same `occ app:enable filedropbatch` as above. This is
+the path used by this repo's own [local dev environment](#local-dev-environment) below.
+
+### After enabling
+
+The app adds a "File Drop Batch" entry to the Nextcloud navigation bar - any logged-in user can open it
+and build a show straight away. Nothing further is required unless you want site-server sync or Google
+Sheets sync, both of which are configured once by an admin under **Settings → Administration → File Drop
+Batch** (see the two linked sections above).
 
 ### Note on link expiry
 

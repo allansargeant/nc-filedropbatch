@@ -41,13 +41,22 @@
 <div id="filedropbatch" class="filedropbatch">
     <h2>File Drop Batch</h2>
     <p class="fdb-intro">
-        Upload a CSV with columns <code>Date, Theatre, Start Time, presenter name, presenter email</code>.
-        A folder and an upload-only file drop link will be created for each row, and the link will be
-        emailed to the presenter. Optionally, shared root folders and a Nextcloud account per theatre
-        can also be created below.
+        Build a show from a CSV (columns <code>Date, Theatre, Start Time, presenter name, presenter email</code>)
+        or by entering sessions directly below. A folder and an upload-only file drop link will be created
+        for each session, and the link will be emailed to the presenter. Optionally, shared root folders and
+        a Nextcloud account per theatre can also be created below.
     </p>
 
     <form id="filedropbatch-form" enctype="multipart/form-data">
+        <div class="fdb-field">
+            <label>How do you want to build this show?</label>
+            <div class="fdb-mode-switch">
+                <label class="fdb-checkbox"><input type="radio" name="fdb_mode" checked> Upload CSV</label>
+                <label class="fdb-checkbox"><input type="radio" name="fdb_mode"> Enter manually</label>
+                <label class="fdb-checkbox"><input type="radio" name="fdb_mode"> Link Google Sheet</label>
+            </div>
+        </div>
+
         <div class="fdb-field">
             <label for="fdb-csv-file">CSV file</label>
             <input type="file" id="fdb-csv-file" name="csv_file" value="autumn-showcase-2026.csv">
@@ -93,7 +102,7 @@
             </p>
         </fieldset>
 
-        <button type="submit" class="primary" id="fdb-submit">Process CSV</button>
+        <button type="submit" class="primary" id="fdb-submit">Create show</button>
     </form>
 
     <div id="fdb-results" class="fdb-results">
@@ -181,6 +190,55 @@
                 <tr>
                     <td>Swan</td><td>swan</td><td>Gt2%nMdY6uWq!8fX</td>
                     <td class="fdb-status-created">created</td><td></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="fdb-sessions-section" class="fdb-results">
+        <h3>Sessions</h3>
+        <p class="fdb-hint">
+            Every session created via CSV or added manually. Editing moves the folder to match the new
+            details (the link keeps working); Close revokes the upload link immediately; Delete only
+            stops tracking a session here - the folder, its files, and its link (if still open) are left alone.
+        </p>
+
+        <button type="button" class="primary">Add session</button>
+
+        <table id="fdb-sessions-table">
+            <thead>
+                <tr>
+                    <th>Theatre</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Presenter</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Link</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Globe</td><td>2026-09-12</td><td>17:00</td>
+                    <td>A. Smith</td><td>a.smith@example.com</td>
+                    <td class="fdb-status-open">open</td>
+                    <td><a href="#">https://cloud.example.org/s/Ax3nQpZ9Ke</a></td>
+                    <td class="fdb-actions">
+                        <button type="button">Edit</button>
+                        <button type="button">Close now</button>
+                        <button type="button">Delete</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Rose</td><td>2026-09-13</td><td>09:00</td>
+                    <td>C. White</td><td>c.white@example.com</td>
+                    <td class="fdb-status-closed">closed</td>
+                    <td></td>
+                    <td class="fdb-actions">
+                        <button type="button">Edit</button>
+                        <button type="button">Delete</button>
+                    </td>
                 </tr>
             </tbody>
         </table>

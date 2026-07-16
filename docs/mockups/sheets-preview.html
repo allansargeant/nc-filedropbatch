@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>File Drop Batch - Google Sheets preview</title>
+<link rel="stylesheet" href="../../custom_apps/filedropbatch/css/style.css">
+<style>
+  html, body {
+    margin: 0;
+    background: #14181c;
+    color: #ebebeb;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .nc-topbar {
+    background: #14181c;
+    border-bottom: 1px solid #2a2f35;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: bold;
+  }
+  .nc-topbar .dot {
+    width: 10px; height: 10px; border-radius: 50%; background: #0082c9;
+  }
+  .nc-topbar .path {
+    opacity: 0.6;
+    font-weight: normal;
+  }
+  a { color: #6cb6ea; }
+</style>
+</head>
+<body>
+  <div class="nc-topbar">
+    <span class="dot"></span>
+    <span>Nextcloud</span>
+    <span class="path">&rsaquo; File Drop Batch</span>
+  </div>
+
+<div id="filedropbatch" class="filedropbatch">
+    <h2>File Drop Batch</h2>
+    <p class="fdb-intro">
+        Build a show from a CSV (columns <code>Date, Theatre, Start Time, presenter name, presenter email</code>)
+        or by entering sessions directly below. A folder and an upload-only file drop link will be created
+        for each session, and the link will be emailed to the presenter. Optionally, shared root folders and
+        a Nextcloud account per theatre can also be created below.
+    </p>
+
+    <div class="fdb-field">
+        <label>How do you want to build this show?</label>
+        <div class="fdb-mode-switch">
+            <label class="fdb-checkbox"><input type="radio" name="fdb_mode"> Upload CSV</label>
+            <label class="fdb-checkbox"><input type="radio" name="fdb_mode"> Enter manually</label>
+            <label class="fdb-checkbox"><input type="radio" name="fdb_mode" checked> Link Google Sheet</label>
+        </div>
+    </div>
+
+    <div class="fdb-field">
+        <p class="fdb-hint">
+            Rows are matched across syncs by Theatre + Date + Start time. Removing a row from
+            the sheet automatically closes that session's file drop link immediately, with no
+            confirmation and no undo - the same as clicking "Close now" on it.
+        </p>
+
+        <form class="fdb-add-session-form">
+            <div class="fdb-field">
+                <label for="fdb-sheet-name">Name</label>
+                <input type="text" id="fdb-sheet-name" value="Autumn tour schedule">
+            </div>
+            <div class="fdb-field">
+                <label for="fdb-sheet-url">Google Sheet URL</label>
+                <input type="url" id="fdb-sheet-url" value="https://docs.google.com/spreadsheets/d/1a2B3c4D5e6F7g8H9i0J/edit">
+            </div>
+            <div class="fdb-field">
+                <label for="fdb-sheet-base-folder">Base folder</label>
+                <input type="text" id="fdb-sheet-base-folder" value="File Drops">
+            </div>
+            <div class="fdb-field">
+                <label for="fdb-sheet-expiry">Link expiry date</label>
+                <input type="date" id="fdb-sheet-expiry" value="2026-09-15">
+            </div>
+            <fieldset class="fdb-field">
+                <legend>Root folders</legend>
+                <label class="fdb-checkbox"><input type="checkbox" checked> Holding slides</label>
+                <label class="fdb-checkbox"><input type="checkbox" checked> fonts</label>
+                <label class="fdb-checkbox"><input type="checkbox" checked> schedules</label>
+                <label class="fdb-checkbox"><input type="checkbox" checked> all show</label>
+                <label for="fdb-sheet-custom-folders">Custom folders (comma-separated)</label>
+                <input type="text" id="fdb-sheet-custom-folders" placeholder="Costumes, Props">
+            </fieldset>
+            <div class="fdb-field">
+                <label class="fdb-checkbox">
+                    <input type="checkbox">
+                    Create a Nextcloud account per theatre
+                </label>
+            </div>
+            <div class="fdb-field">
+                <label class="fdb-checkbox">
+                    <input type="checkbox" checked>
+                    Keep this sheet synced automatically
+                </label>
+            </div>
+            <button type="submit" class="primary">Link sheet</button>
+        </form>
+
+        <table id="fdb-sheets-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Base folder</th>
+                    <th>Expiry</th>
+                    <th>Auto-sync</th>
+                    <th>Last sync</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Autumn tour schedule</td>
+                    <td>File Drops</td>
+                    <td>2026-09-15</td>
+                    <td>On</td>
+                    <td>
+                        <span class="fdb-status-success">2026-09-01T09:12:00+00:00 - success</span><br>
+                        Created 1, renamed 0, closed 1, unchanged 4.
+                    </td>
+                    <td class="fdb-actions">
+                        <button type="button">Sync now</button>
+                        <button type="button">Edit</button>
+                        <button type="button">Unlink</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Winter panto schedule</td>
+                    <td>File Drops</td>
+                    <td>2026-12-20</td>
+                    <td>Off</td>
+                    <td>Never synced</td>
+                    <td class="fdb-actions">
+                        <button type="button">Sync now</button>
+                        <button type="button">Edit</button>
+                        <button type="button">Unlink</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>
