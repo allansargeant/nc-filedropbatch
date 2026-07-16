@@ -1,0 +1,40 @@
+name: release
+
+# A Nextcloud app is PHP (not a native binary). This packages the app directory
+# into the installable tarball Nextcloud expects (extract into custom_apps/).
+# Trigger manually (Actions > release > Run workflow) or by pushing a v* tag.
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build app tarball
+        shell: bash
+        run: |
+          ver=$(grep -oE '<version>[^<]+' custom_apps/filedropbatch/appinfo/info.xml | sed 's/<version>//')
+          echo "Packaging filedropbatch v$ver"
+          tar czf "filedropbatch-${ver}.tar.gz" -C custom_apps filedropbatch
+          ls -la filedropbatch-*.tar.gz
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: filedropbatch-nextcloud-app
+          path: filedropbatch-*.tar.gz
+          if-no-files-found: error
+
+      - name: Publish release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: filedropbatch-*.tar.gz
+          generate_release_notes: true
