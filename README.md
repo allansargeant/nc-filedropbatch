@@ -1,5 +1,9 @@
 # File Drop Batch
 
+[![lint](https://github.com/allansargeant/nc-filedropbatch/actions/workflows/lint.yml/badge.svg)](https://github.com/allansargeant/nc-filedropbatch/actions/workflows/lint.yml)
+[![test](https://github.com/allansargeant/nc-filedropbatch/actions/workflows/test.yml/badge.svg)](https://github.com/allansargeant/nc-filedropbatch/actions/workflows/test.yml)
+[![release](https://github.com/allansargeant/nc-filedropbatch/actions/workflows/release.yml/badge.svg)](https://github.com/allansargeant/nc-filedropbatch/actions/workflows/release.yml)
+
 > **AI-assisted project.** This codebase was created with [Claude Code](https://claude.com/claude-code)
 > (Anthropic), directed and reviewed by a human author — including the code, the docs,
 > and the visuals in this README. Review it yourself before relying on it in production,
@@ -161,6 +165,22 @@ docker compose --env-file .env -p fdb-site -f docker-compose.site-server.yml up 
 This exposes the site instance at `http://localhost:8081`. From inside the primary `app` container, reach it via Docker Desktop's `http://host.docker.internal:8081` (its published port isn't reachable via `localhost` from another container) - that's the URL to enter as the "Remote Nextcloud URL" in admin settings, with an app password created on the site instance (Settings → Security) as the remote password. `rclone` itself isn't bundled in the official Nextcloud image, so install it into the primary container for testing: `docker compose exec -u root app bash -c "curl -s https://rclone.org/install.sh | bash"`.
 
 To simulate a batch's expiry actually having passed (new batches always require an expiry of at least tomorrow, so none will be naturally due yet), backdate it directly: `docker compose exec db mysql -u nextcloud -p"$DB_PASSWORD" nextcloud -e "UPDATE oc_fdb_batches SET expiry_date = '2020-01-01' WHERE id = 1;"`. Then either wait for real cron activity, or trigger the specific job immediately for testing with `occ background-job:list` (to find its id) followed by `occ background-job:execute <id>` - `cron.php` alone only advances one due job per invocation (by design, matching how a real system cron ticks over time), so repeated manual invocations aren't a reliable way to test a specific job on demand.
+
+## Running tests
+
+A small PHPUnit suite covers the pure logic that has no Nextcloud runtime dependency
+(`PathSanitizer`, `CsvReader`) - no Nextcloud instance, database, or Composer install needed:
+
+```
+cd custom_apps/filedropbatch
+phpunit
+```
+
+CI runs this on every push/PR (see the `test` badge above), alongside a `lint` job that
+`php -l`s every file and checks `appinfo/info.xml` is well-formed. Everything else - controllers
+and services that depend on Nextcloud's runtime (`IRootFolder`, `Share\IManager`, etc.) - is
+covered by manual verification against a real instance instead (see [Local dev
+environment](#local-dev-environment) above).
 
 ## Roadmap / TODO
 
