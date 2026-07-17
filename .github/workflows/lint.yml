@@ -1,0 +1,40 @@
+name: lint
+
+# Fast static checks for the Nextcloud app: PHP syntax on every file, and
+# that appinfo/info.xml is well-formed. Catches the kind of mistake a local
+# dev environment without PHP/Docker installed can't catch before a push.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  php-syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+
+      - name: Lint all PHP files
+        shell: bash
+        run: |
+          status=0
+          while IFS= read -r -d '' file; do
+            php -l "$file" || status=1
+          done < <(find custom_apps/filedropbatch -name '*.php' -print0)
+          exit $status
+
+      - name: Validate appinfo/info.xml is well-formed
+        shell: bash
+        run: |
+          php -r '
+            $doc = new DOMDocument();
+            if (!$doc->load("custom_apps/filedropbatch/appinfo/info.xml")) {
+              fwrite(STDERR, "info.xml is not well-formed XML\n");
+              exit(1);
+            }
+            echo "info.xml OK\n";
+          '
