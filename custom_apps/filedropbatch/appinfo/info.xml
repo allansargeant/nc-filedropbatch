@@ -16,7 +16,7 @@ early, or removed - and a session synced from a Google Sheet is automatically cl
 disappears from that sheet. Can also automatically mirror the whole base folder to a separate Nextcloud
 instance via rclone over WebDAV once a batch's file-drop links have expired, for replicating collected
 files to a server taken to the event site.]]></description>
-    <version>1.4.0</version>
+    <version>1.4.1</version>
     <licence>agpl</licence>
     <author>Allan Sargeant</author>
     <namespace>FileDropBatch</namespace>

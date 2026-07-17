@@ -51,6 +51,24 @@ class SheetSyncService {
         $unchanged = 0;
         $errors = [];
 
+        // Mirrors processBatch()'s CSV/manual behaviour: (re)ensure the sheet's
+        // configured root folders and, if enabled, a theatre user account for
+        // every distinct theatre currently in the sheet - idempotent, so this
+        // runs every sync rather than only when a session is first created.
+        $rootFolderNames = array_values(array_filter(array_map('trim', explode(',', $sheet->getRootFolderNames()))));
+        $userResults = $this->batchProcessor->ensureRootFoldersAndTheatreUsers(
+            $sheet->getUserId(),
+            $sheet->getBaseFolder(),
+            $rootFolderNames,
+            $this->batchProcessor->distinctTheatres($rows),
+            $sheet->getCreateUsers(),
+        );
+        foreach ($userResults as $userResult) {
+            if ($userResult['status'] === 'error') {
+                $errors[] = "Could not set up theatre account for \"{$userResult['theatre']}\": {$userResult['message']}";
+            }
+        }
+
         foreach ($this->sessionMapper->findOpenBySheet($sheet->getId()) as $session) {
             $key = $this->naturalKey($session->getTheatre(), $session->getDate(), $session->getStartTime());
 

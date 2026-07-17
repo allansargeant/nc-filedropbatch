@@ -77,17 +77,18 @@ class BatchProcessorService {
         array $rootFolderNames = [],
         bool $createUsers = false,
     ): array {
-        $rootFolders = $this->createRootFolders($userId, $baseFolder, $rootFolderNames);
+        $userResults = $this->ensureRootFoldersAndTheatreUsers(
+            $userId,
+            $baseFolder,
+            $rootFolderNames,
+            $this->distinctTheatres($inputRows),
+            $createUsers,
+        );
 
-        $userResults = [];
         $userSummary = ['total' => 0, 'created' => 0, 'existing' => 0, 'error' => 0];
-        if ($createUsers) {
-            foreach ($this->distinctTheatres($inputRows) as $theatre) {
-                $userResult = $this->processTheatreUser($userId, $baseFolder, $theatre, $rootFolders);
-                $userResults[] = $userResult;
-                $userSummary['total']++;
-                $userSummary[$userResult['status']]++;
-            }
+        foreach ($userResults as $userResult) {
+            $userSummary['total']++;
+            $userSummary[$userResult['status']]++;
         }
 
         $resultRows = [];
@@ -150,6 +151,39 @@ class BatchProcessorService {
     }
 
     /**
+     * Ensures the given root folders exist and, if requested, ensures a
+     * theatre user account (+ shares) exists for every distinct theatre name
+     * passed in. Idempotent - safe to call on every sync/batch run, not just
+     * the first time a theatre is seen. Shared by processBatch() (CSV/manual)
+     * and SheetSyncService (Google Sheets sync), so both paths honour the
+     * same "create Nextcloud accounts per theatre" setting identically.
+     *
+     * @param string[] $rootFolderNames
+     * @param string[] $theatreNames
+     * @return array<int, array<string, mixed>> theatre user results (empty if $createUsers is false)
+     */
+    public function ensureRootFoldersAndTheatreUsers(
+        string $userId,
+        string $baseFolder,
+        array $rootFolderNames,
+        array $theatreNames,
+        bool $createUsers,
+    ): array {
+        $rootFolders = $this->createRootFolders($userId, $baseFolder, $rootFolderNames);
+
+        if (!$createUsers) {
+            return [];
+        }
+
+        $userResults = [];
+        foreach ($theatreNames as $theatre) {
+            $userResults[] = $this->processTheatreUser($userId, $baseFolder, $theatre, $rootFolders);
+        }
+
+        return $userResults;
+    }
+
+    /**
      * @param string[] $rootFolderNames
      * @return \OCP\Files\Folder[]
      */
@@ -169,7 +203,7 @@ class BatchProcessorService {
     }
 
     /** @return string[] distinct, non-blank theatre names in CSV row order */
-    private function distinctTheatres(array $inputRows): array {
+    public function distinctTheatres(array $inputRows): array {
         $seen = [];
         foreach ($inputRows as $row) {
             $theatre = trim($row['theatre'] ?? '');
