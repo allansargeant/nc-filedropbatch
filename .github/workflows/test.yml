@@ -1,0 +1,28 @@
+name: test
+
+# Unit tests for pure logic only (PathSanitizer, CsvReader) - classes with no
+# constructor dependencies on OCP interfaces, so no Nextcloud bootstrap is
+# needed. This deliberately does not attempt to test controllers/services
+# that depend on Nextcloud's runtime (IRootFolder, Share\IManager, etc.) -
+# those are covered by manual verification against a real instance instead.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  phpunit:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: custom_apps/filedropbatch
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          tools: phpunit
+
+      - name: Run unit tests
+        run: phpunit
