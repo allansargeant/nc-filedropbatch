@@ -52,7 +52,7 @@ stores nothing at all, minting a short-lived app token per sync and revoking it 
 ## 2. The shared-CSV contract
 
 The **same session CSV** drives this app and
-[resolve-configurator](https://github.com/allansargeant/resolve-configurator), which scaffolds
+[resolve-configurator](https://github.com/stoatworks-labs/resolve-configurator), which scaffolds
 the DaVinci Resolve project for the same event.
 
 ```

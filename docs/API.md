@@ -112,7 +112,7 @@ there", not "no password was set".
 ## 2. The session CSV contract
 
 > **The same session CSV drives this app and
-> [resolve-configurator](https://github.com/allansargeant/resolve-configurator)**, which
+> [resolve-configurator](https://github.com/stoatworks-labs/resolve-configurator)**, which
 > scaffolds the DaVinci Resolve project for the same event. **If you change what a column means,
 > check that repo too** — neither repo's tests would catch a divergence on their own.
 

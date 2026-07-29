@@ -22,12 +22,12 @@ files to a server taken to the event site.]]></description>
     <namespace>FileDropBatch</namespace>
     <category>files</category>
     <category>organization</category>
-    <website>https://github.com/allansargeant/nc-filedropbatch</website>
-    <repository>https://github.com/allansargeant/nc-filedropbatch.git</repository>
-    <bugs>https://github.com/allansargeant/nc-filedropbatch/issues</bugs>
-    <screenshot>https://raw.githubusercontent.com/allansargeant/nc-filedropbatch/main/docs/screenshots/app-preview.png</screenshot>
-    <screenshot>https://raw.githubusercontent.com/allansargeant/nc-filedropbatch/main/docs/screenshots/sheets-preview.png</screenshot>
-    <screenshot>https://raw.githubusercontent.com/allansargeant/nc-filedropbatch/main/docs/screenshots/admin-settings-preview.png</screenshot>
+    <website>https://github.com/stoatworks-labs/nc-filedropbatch</website>
+    <repository>https://github.com/stoatworks-labs/nc-filedropbatch.git</repository>
+    <bugs>https://github.com/stoatworks-labs/nc-filedropbatch/issues</bugs>
+    <screenshot>https://raw.githubusercontent.com/stoatworks-labs/nc-filedropbatch/main/docs/screenshots/app-preview.png</screenshot>
+    <screenshot>https://raw.githubusercontent.com/stoatworks-labs/nc-filedropbatch/main/docs/screenshots/sheets-preview.png</screenshot>
+    <screenshot>https://raw.githubusercontent.com/stoatworks-labs/nc-filedropbatch/main/docs/screenshots/admin-settings-preview.png</screenshot>
     <dependencies>
         <php min-version="8.1"/>
         <nextcloud min-version="27" max-version="31"/>

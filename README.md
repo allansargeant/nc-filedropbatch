@@ -1,8 +1,8 @@
 # File Drop Batch
 
-[![lint](https://github.com/allansargeant/nc-filedropbatch/actions/workflows/lint.yml/badge.svg)](https://github.com/allansargeant/nc-filedropbatch/actions/workflows/lint.yml)
-[![test](https://github.com/allansargeant/nc-filedropbatch/actions/workflows/test.yml/badge.svg)](https://github.com/allansargeant/nc-filedropbatch/actions/workflows/test.yml)
-[![release](https://github.com/allansargeant/nc-filedropbatch/actions/workflows/release.yml/badge.svg)](https://github.com/allansargeant/nc-filedropbatch/actions/workflows/release.yml)
+[![lint](https://github.com/stoatworks-labs/nc-filedropbatch/actions/workflows/lint.yml/badge.svg)](https://github.com/stoatworks-labs/nc-filedropbatch/actions/workflows/lint.yml)
+[![test](https://github.com/stoatworks-labs/nc-filedropbatch/actions/workflows/test.yml/badge.svg)](https://github.com/stoatworks-labs/nc-filedropbatch/actions/workflows/test.yml)
+[![release](https://github.com/stoatworks-labs/nc-filedropbatch/actions/workflows/release.yml/badge.svg)](https://github.com/stoatworks-labs/nc-filedropbatch/actions/workflows/release.yml)
 
 > **AI-assisted project.** This codebase was created with [Claude Code](https://claude.com/claude-code)
 > (Anthropic), directed and reviewed by a human author — including the code, the docs,
@@ -74,7 +74,7 @@ Neither is required for the core CSV/manual-entry/file-drop/session-management f
 
 ### Option A - install a release (recommended)
 
-1. Download `filedropbatch-<version>.tar.gz` from the [Releases page](https://github.com/allansargeant/nc-filedropbatch/releases).
+1. Download `filedropbatch-<version>.tar.gz` from the [Releases page](https://github.com/stoatworks-labs/nc-filedropbatch/releases).
 2. Extract it into your Nextcloud instance's app directory - it already contains the correct `filedropbatch/` top-level folder:
    ```
    tar -xzf filedropbatch-<version>.tar.gz -C /path/to/nextcloud/custom_apps/

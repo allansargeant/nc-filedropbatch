@@ -36,7 +36,7 @@ Date, Theatre, Start Time, presenter name, presenter email
 Any missing column **aborts the whole file** with a message naming what's absent — nothing is
 created, so a rejected CSV is safe to fix and re-upload.
 
-**The same CSV drives [resolve-configurator](https://github.com/allansargeant/resolve-configurator)**,
+**The same CSV drives [resolve-configurator](https://github.com/stoatworks-labs/resolve-configurator)**,
 which builds the DaVinci Resolve project for the same event. Keep one file, feed it to both.
 
 ### ⚠ Dates are read day-first
