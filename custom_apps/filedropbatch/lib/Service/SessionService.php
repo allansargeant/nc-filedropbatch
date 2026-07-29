@@ -25,6 +25,20 @@ class SessionService {
     }
 
     /** Returns a human-readable error message, or null if the fields are valid. */
+    /**
+     * Returns null if the row is usable, or a human-readable reason if not.
+     *
+     * The date parser tries an ordered list of formats and falls back to
+     * strtotime(). d/m/Y IS TRIED BEFORE m/d/Y, so an ambiguous value like
+     * "03/04/2026" is read as 3 April, not 4 March, and there is no setting
+     * for it - a US-format schedule silently lands on the wrong day whenever
+     * the day is 12 or lower. The strtotime() fallback is also very
+     * permissive and will accept things a spreadsheet never meant.
+     *
+     * Note the parsed date is used for VALIDATION ONLY. The folder is named
+     * from the original string, so "2026-08-01" and "1 Aug 2026" both pass
+     * and produce two different folders for the same day.
+     */
     public function validateFields(string $date, string $theatre, string $startTime, string $presenterName): ?string {
         foreach (['date' => $date, 'theatre' => $theatre, 'start time' => $startTime, 'presenter name' => $presenterName] as $field => $value) {
             if ($value === '') {
@@ -46,6 +60,26 @@ class SessionService {
      * Creates the folder, file-drop share, and (if the email address looks
      * valid) sends the link - the same sequence for a CSV row or a manually
      * added session. Caller must have already run validateFields().
+     *
+     * The returned `status` is the whole point of this method and the three
+     * values mean operationally different things:
+     *
+     *   'success' - folder, link and email all done. Nothing left to do.
+     *   'partial' - FOLDER AND LINK EXIST, EMAIL WAS NOT SENT. The presenter
+     *               has a working upload link and no idea it exists, so
+     *               somebody must deliver it by hand. Two causes, told apart
+     *               only by `message`: the address failed
+     *               FILTER_VALIDATE_EMAIL, or the mailer threw.
+     *   'error'   - no usable link. Note the folder may still have been
+     *               created (share creation failing after folder creation
+     *               yields 'error' with a message saying so).
+     *
+     * Every step after validation is caught and logged rather than thrown, so
+     * ONE BAD ROW NEVER ABORTS A BATCH. Keep that: a 90-row run that dies on
+     * row 4 is worse than one reporting four errors.
+     *
+     * This method sends real email to real people, with no preview and no
+     * undo, and creates a public link anyone with the URL can upload to.
      *
      * @return array{status: string, message: string, folderPath: string, shareLink: string, shareId: string, emailSent: bool}
      */

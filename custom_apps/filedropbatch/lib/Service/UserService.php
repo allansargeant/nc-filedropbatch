@@ -21,6 +21,14 @@ class UserService {
 
     /**
      * Sanitizes a theatre name into a valid, stable Nextcloud user ID.
+     *
+     * Lowercases and replaces anything outside [a-z0-9._-] with '-', so
+     * "Studio One", "studio-one" and "STUDIO/ONE" ALL COLLAPSE TO THE SAME
+     * USERNAME. Two genuinely different theatres that sanitize alike will
+     * share one account - and therefore one theatre's account gets access to
+     * the other's folder, which is exactly the isolation this feature exists
+     * to provide. There is no collision check; theatre names have to be
+     * distinct after sanitizing.
      */
     public function sanitizeUsername(string $theatre): string {
         $clean = strtolower(trim($theatre));
@@ -35,8 +43,14 @@ class UserService {
     }
 
     /**
-     * Generates a high-entropy password guaranteed to contain at least one
-     * upper-case, lower-case, digit, and symbol character.
+     * Generates a high-entropy 16-character password guaranteed to contain at
+     * least one upper-case, lower-case, digit and symbol character.
+     *
+     * The alphabets deliberately omit ambiguous glyphs (I, l, O, 0, 1) because
+     * these are read off a printed CSV and typed by hand. The shuffle uses
+     * random_int() rather than str_shuffle(), which is not cryptographically
+     * secure - the guaranteed-character trick is worthless if the positions
+     * are predictable.
      */
     public function generatePassword(): string {
         $chars = [

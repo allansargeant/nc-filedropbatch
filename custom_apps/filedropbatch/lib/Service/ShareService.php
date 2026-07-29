@@ -12,6 +12,14 @@ use OCP\Share\Exceptions\ShareNotFound;
 use OCP\Share\IManager;
 use OCP\Share\IShare;
 
+/**
+ * Creation of the two share types this app makes: the public upload-only link
+ * a presenter uses, and the per-theatre user share.
+ *
+ * Both are real, externally-visible grants. A file-drop link is usable by
+ * ANYONE WHO HAS THE URL, with no account and no password - that is what the
+ * feature is for, and it is also why the batch expiry is mandatory.
+ */
 class ShareService {
     public function __construct(
         private IManager $shareManager,
@@ -21,6 +29,20 @@ class ShareService {
 
     /**
      * Creates an upload-only "file drop" public link share for the given folder.
+     */
+    /**
+     * Create Nextcloud's "File drop (upload only)" public link for a folder.
+     *
+     * CREATE permission with no READ is what makes it upload-only: a holder of
+     * the URL can put files in and cannot list or download what is already
+     * there. Adding READ here would expose every presenter's uploads to every
+     * other presenter.
+     *
+     * Expiry is day-granular on Nextcloud's side - the share manager truncates
+     * both the expiration and "now" to midnight before comparing - so the link
+     * dies at 00:00 on the chosen date rather than at the end of it. See
+     * BatchProcessorService::parseExpiry(), which rejects today for that
+     * reason.
      */
     public function createFileDropShare(Folder $folder, string $ownerUid, \DateTimeInterface $expiry): IShare {
         $share = $this->shareManager->newShare();
