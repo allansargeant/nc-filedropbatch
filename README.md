@@ -47,6 +47,19 @@ Optionally, it can also:
 Date, Theatre, Start Time, presenter name, presenter email
 ```
 
+## Documentation
+
+| Doc | Contents |
+|---|---|
+| [docs/USER-GUIDE.md](docs/USER-GUIDE.md) | Running a batch: the CSV, expiry, reading the results, theatre accounts, troubleshooting |
+| [docs/API.md](docs/API.md) | HTTP routes, the session-CSV contract, admin config keys, tables, background jobs |
+| [docs/DEVELOPING.md](docs/DEVELOPING.md) | The pipeline, migrations, tests, and the security rules |
+
+Two things it is worth knowing before a first batch, both covered in the user guide:
+**ambiguous dates are read day-first** (`03/04/2026` is 3 April), and **a link set to expire on
+a date stops working at 00:00 that day**, so set the expiry to the day *after* uploads should
+stop.
+
 ## Installing
 
 **Requirements:** PHP 8.1+ and Nextcloud 27-31 (see `<dependencies>` in `appinfo/info.xml`). No Composer
