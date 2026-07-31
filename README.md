@@ -27,6 +27,20 @@ Optionally, it can also:
 - track every session in a persistent Sessions list, where you can edit its details, close its link early, or remove it - see [Managing sessions](#managing-sessions) below.
 - build a show directly in the browser instead of preparing a CSV, or link a Google Sheet and keep it live-synced, with a row's removal from the sheet automatically closing its session - see [Building a show without a CSV](#building-a-show-without-a-csv) below.
 
+<!-- downloads:start -->
+
+## Download
+
+**[v1.4.2](https://github.com/stoatworks-labs/nc-filedropbatch/releases/tag/v1.4.2)**
+
+This release contains:
+
+- [`filedropbatch-1.4.2.tar.gz`](https://github.com/stoatworks-labs/nc-filedropbatch/releases/download/v1.4.2/filedropbatch-1.4.2.tar.gz) — Nextcloud app package, 41 KB
+
+All builds, checksums and release notes: [github.com/stoatworks-labs/nc-filedropbatch/releases](https://github.com/stoatworks-labs/nc-filedropbatch/releases).
+
+<!-- downloads:end -->
+
 ## The upload page
 
 ![The upload form and results tables, with sample data](docs/screenshots/app-preview.png)
