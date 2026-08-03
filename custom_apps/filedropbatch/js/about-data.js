@@ -12,7 +12,7 @@
 window.STOATWORKS_ABOUT = Object.assign({
   "name": "File Drop Batch",
   "slug": "nc-filedropbatch",
-  "version": "",
+  "version": "v1.4.2",
   "hook": "Bulk file drops in Nextcloud",
   "licence": "AGPL-3.0",
   "guide": "https://stoatworks-labs.com/software/nc-filedropbatch/guide/",
