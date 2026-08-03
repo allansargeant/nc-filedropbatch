@@ -200,3 +200,19 @@ fieldset.fdb-field legend {
     gap: 6px;
     white-space: nowrap;
 }
+
+/* The title and the About trigger share a line. The dialog itself is styled in
+   its own shadow root and inherits nothing from here. */
+.fdb-titlebar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.fdb-about {
+    opacity: .7;
+}
+.fdb-about:hover {
+    opacity: 1;
+}

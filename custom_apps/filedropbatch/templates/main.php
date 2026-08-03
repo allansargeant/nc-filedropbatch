@@ -3,7 +3,12 @@
 /** @var \OCP\IL10N $l */
 ?>
 <div id="filedropbatch" class="filedropbatch">
-    <h2>File Drop Batch</h2>
+    <div class="fdb-titlebar">
+        <h2>File Drop Batch</h2>
+        <!-- Opens the shared About dialog; about.js delegates this attribute
+             from the document, so filedropbatch-main.js wires up no handler. -->
+        <button type="button" class="fdb-about" data-stoatworks-about><?php p($l->t('About')); ?></button>
+    </div>
     <p class="fdb-intro">
         Build a show from a CSV (columns <code>Date, Theatre, Start Time, presenter name, presenter email</code>)
         or by entering sessions directly below. A folder and an upload-only file drop link will be created
